@@ -18,6 +18,10 @@ on:
             description: file prefix
             type: string
             required: true
+permissions:
+   contents: write
+   packages: write
+   pull-requests: write
 jobs:
    update-plugin:
       runs-on: ubuntu-latest
@@ -31,8 +35,8 @@ jobs:
            id: generate-token
            uses: actions/create-github-app-token@v2
            with:
-              app-id: ${{ vars.GS_DEV_APP_ID }}
-              private-key: ${{ secrets.GS_DEV_APP_PK }}
+              app-id: ${{ vars.DS_GH_APP_ID }}
+              private-key: ${{ secrets.DS_GH_APP_PK }}
               repositories: ${{ inputs.repository }}
          - uses: robinraju/release-downloader@v1
            with:

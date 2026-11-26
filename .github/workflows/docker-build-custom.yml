@@ -8,16 +8,16 @@ on:
         type: string
         required: true
       base_tag:
-        description: Which tag to use for the base image (digiserve/service-cli)
+        description: Which tag to use for the base image (ghcr.io/cruglobal-ai/service-cli)
         default: develop
         type: choice
         options: [ master, develop ]
 jobs:
   call-docker-build:
-    uses: CruGlobal/.github/.github/workflows/docker-build.yml@main
+    uses: CruGlobal-AI/ab-workflows/.github/workflows/docker-build.yml@main
+    permissions:
+      contents: read
+      packages: write
     with:
       base_tag: ${{ inputs.base_tag }}
       tags: ${{ inputs.tags }}
-    secrets: 
-      DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
