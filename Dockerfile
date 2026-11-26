@@ -1,16 +1,16 @@
 ##
-## digiserve/ab-web
+## ghcr.io/cruglobal-ai/ab-web
 ##
 ## This is our web server for our incoming connections. We bundle
 ## nginx with our UI resources necessary for running our platform.
 ##
 ## Docker Commands:
 ## ---------------
-## $ docker build -t digiserve/ab-web:master .
-## $ docker push digiserve/ab-web:master
+## $ docker build -t ghcr.io/cruglobal-ai/ab-web:master .
+## $ docker push ghcr.io/cruglobal-ai/ab-web:master
 ##
 ## Multi-platform / supply chain: use buildx with --provenance=true --sbom=true when pushing to a registry.
-## Or use: $ DOCKER_ARGS="-t digiserve/ab-web:master --push" ./build.sh
+## Or use: $ DOCKER_ARGS="-t ghcr.io/cruglobal-ai/ab-web:master --push" ./build.sh
 ##
 
 FROM nginx:stable-alpine

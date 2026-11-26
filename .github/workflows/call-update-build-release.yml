@@ -3,6 +3,10 @@ run-name: Update ${{ github.event.client_payload.repo }} to ${{ github.event.cli
 on:
   repository_dispatch:
     types: [web_new_version]
+permissions:
+  contents: write
+  packages: write
+  pull-requests: write
 jobs:
   call-update-platform_web:
     if: ${{ github.event.client_payload.repo == 'ab_platform_web' }}
@@ -18,12 +22,10 @@ jobs:
     name: Update Service Web ${{ matrix.branch }} (Platform)
     uses: ./.github/workflows/update-build-release.yml
     secrets:
-      app_secret: ${{ secrets.GS_DEV_APP_PK }}
-      DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      app_secret: ${{ secrets.DS_GH_APP_PK }}
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
     with: 
-      app_id: ${{ vars.GS_DEV_APP_ID }}
+      app_id: ${{ vars.DS_GH_APP_ID }}
       version: ${{ github.event.client_payload.version }}
       type: ${{ github.event.client_payload.type }}
       pre_release: ${{ matrix.pre_release }}
@@ -47,11 +49,9 @@ jobs:
     name: Update Service Web ${{ matrix.branch }} (Designer)
     uses: ./.github/workflows/update-build-release.yml
     secrets:
-      app_secret: ${{ secrets.GS_DEV_APP_PK }}
-      DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      app_secret: ${{ secrets.DS_GH_APP_PK }}
     with: 
-      app_id: ${{ vars.GS_DEV_APP_ID }}
+      app_id: ${{ vars.DS_GH_APP_ID }}
       version: ${{ github.event.client_payload.version }}
       type: ${{ github.event.client_payload.type }}
       pre_release: ${{ matrix.pre_release }}
@@ -103,12 +103,10 @@ jobs:
     name: Update Service Web ${{ matrix.branch }} (PWA)
     uses: ./.github/workflows/update-build-release.yml
     secrets:
-      app_secret: ${{ secrets.GS_DEV_APP_PK }}
-      DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      app_secret: ${{ secrets.DS_GH_APP_PK }}
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
     with: 
-      app_id: ${{ vars.GS_DEV_APP_ID }}
+      app_id: ${{ vars.DS_GH_APP_ID }}
       version: ${{ github.event.client_payload.version }}
       type: ${{ github.event.client_payload.type }}
       pre_release: ${{ matrix.pre_release }}
@@ -132,11 +130,9 @@ jobs:
     name: Update Service Web ${{ matrix.branch }} (HRTeam)
     uses: ./.github/workflows/update-build-release.yml
     secrets:
-      app_secret: ${{ secrets.GS_DEV_APP_PK }}
-      DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      app_secret: ${{ secrets.DS_GH_APP_PK }}
     with:
-      app_id: ${{ vars.GS_DEV_APP_ID }}
+      app_id: ${{ vars.DS_GH_APP_ID }}
       version: ${{ github.event.client_payload.version }}
       type: ${{ github.event.client_payload.type }}
       pre_release: ${{ matrix.pre_release }}
