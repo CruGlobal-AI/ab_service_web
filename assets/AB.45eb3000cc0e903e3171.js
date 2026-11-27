@@ -1220,7 +1220,7 @@ class ABFactory extends _core_ABFactoryCore__WEBPACK_IMPORTED_MODULE_0__["defaul
       // Load included plugins when available (e.g. platform/plugins/included/).
       // Optional so unit tests and CI can run when that path is not present.
       try {
-         const LocalPlugins = await Promise.all(/*! import() */[__webpack_require__.e("vendor-node_modules_image-size_dist_index_js-node_modules_jszip-utils_lib_index_js"), __webpack_require__.e("AppBuilder_platform_plugins_included_index_js")]).then(__webpack_require__.bind(__webpack_require__, /*! ./platform/plugins/included/index.js */ 30188));
+         const LocalPlugins = await __webpack_require__.e(/*! import() */ "AppBuilder_platform_plugins_included_index_js").then(__webpack_require__.bind(__webpack_require__, /*! ./platform/plugins/included/index.js */ 30188));
          return LocalPlugins.default.load(this);
       } catch (e) {
          if (e?.code !== "MODULE_NOT_FOUND") throw e;
@@ -1653,6 +1653,10 @@ class ABApplicationCore extends _platform_ABMLClass_js__WEBPACK_IMPORTED_MODULE_
    constructor(attributes, AB) {
       super(["label", "description"], AB);
 
+      this.fromValues(attributes);
+   }
+
+   fromValues(attributes) {
       // attributes should be in format:
       // {
       //    id:##,
@@ -2344,10 +2348,14 @@ class ABApplicationCore extends _platform_ABMLClass_js__WEBPACK_IMPORTED_MODULE_
    /**
     * @method viewAll()
     * return a list of all the {ABViewxxx} classes available.
+    * Passes this application's platform so web vs pwa plugins resolve correctly.
     * @return {array} of ABView objects
     */
    viewAll(fn = () => true) {
-      return this.ViewManager.allViews(fn);
+      const raw = (this.appType || "web").toString().trim().toLowerCase();
+      const platform =
+         raw === "mobile" || raw === "pwa" ? "pwa" : "web";
+      return this.ViewManager.allViews(fn, platform);
    }
 
    ///
@@ -7121,8 +7129,9 @@ class ABFactory extends _platform_ABEmitter_js__WEBPACK_IMPORTED_MODULE_24__["de
    //
    // Plugin
    //
-   pluginAPI() {
+   pluginAPI(additionalResources = {}) {
       let api = this.ClassManager.getPluginAPI();
+      api = Object.assign(api, additionalResources);
       api.AB = this;
       api.platform = this.platform ?? "service";
       return api;
@@ -7135,8 +7144,8 @@ class ABFactory extends _platform_ABEmitter_js__WEBPACK_IMPORTED_MODULE_24__["de
       return Promise.resolve();
    }
 
-   pluginRegister(plugin) {
-      let pluginClass = plugin(this.pluginAPI());
+   pluginRegister(plugin, additionalResources = {}) {
+      let pluginClass = plugin(this.pluginAPI(additionalResources));
       if (Array.isArray(pluginClass)) {
          pluginClass.forEach((p) => {
             this.ClassManager.pluginRegister(p);
@@ -8158,8 +8167,6 @@ class ABMLClassCore extends _platform_ABEmitter_js__WEBPACK_IMPORTED_MODULE_0__[
 
                // copy each field to the root object
                fields.forEach(function (f) {
-                  if (t[f] != null) obj[f] = t[f];
-
                   obj[f] = t[f] || ""; // default to '' if not found.
                });
             }
@@ -12583,14 +12590,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ ABViewManagerCore)
 /* harmony export */ });
 /* harmony import */ var _platform_views_ABView_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../platform/views/ABView.js */ 30747);
-/* harmony import */ var _platform_views_ABViewConditionalContainer_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../platform/views/ABViewConditionalContainer.js */ 68640);
-/* harmony import */ var _platform_views_ABViewConnectDataFilter_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../platform/views/ABViewConnectDataFilter.js */ 82859);
-/* harmony import */ var _platform_views_ABViewContainer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../platform/views/ABViewContainer.js */ 76528);
-/* harmony import */ var _platform_views_ABViewDataFilter_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../platform/views/ABViewDataFilter.js */ 70153);
-/* harmony import */ var _platform_views_ABViewMenu_js__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../platform/views/ABViewMenu.js */ 46672);
-/* harmony import */ var _platform_views_ABViewPage_js__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../platform/views/ABViewPage.js */ 44);
-/* harmony import */ var _platform_views_ABViewReportsManager_js__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../platform/views/ABViewReportsManager.js */ 87929);
-/* harmony import */ var _platform_views_ABViewScheduler_js__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../platform/views/ABViewScheduler.js */ 36506);
+/* harmony import */ var _platform_views_ABViewPage_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../platform/views/ABViewPage.js */ 44);
 
 // import Import_ABViewCarousel from "../platform/views/ABViewCarousel.js";
 // import Import_ABViewChart from "../platform/views/ABViewChart.js";
@@ -12599,12 +12599,12 @@ __webpack_require__.r(__webpack_exports__);
 // import Import_ABViewChartLine from "../platform/views/ABViewChartLine.js";
 // import Import_ABViewChartPie from "../platform/views/ABViewChartPie.js";
 // import Import_ABViewComment from "../platform/views/ABViewComment.js";
-
-
-
+// import Import_ABViewConditionalContainer from "../platform/views/ABViewConditionalContainer.js";
+// import Import_ABViewConnectDataFilter from "../platform/views/ABViewConnectDataFilter.js";
+// import Import_ABViewContainer from "../platform/views/ABViewContainer.js";
 // import Import_ABViewCSVExporter from "../platform/views/ABViewCSVExporter.js";
 // import Import_ABViewCSVImporter from "../platform/views/ABViewCSVImporter.js";
-
+// import Import_ABViewDataFilter from "../platform/views/ABViewDataFilter.js";
 // import Import_ABViewDataSelect from "../platform/views/ABViewDataSelect.js";
 // import Import_ABViewDataview from "../platform/views/ABViewDataview.js";
 // import Import_ABViewDocxBuilder from "../platform/views/ABViewDocxBuilder.js";
@@ -12613,7 +12613,7 @@ __webpack_require__.r(__webpack_exports__);
 // import Import_ABViewLabel from "../platform/views/ABViewLabel.js";
 // import Import_ABViewLayout from "../platform/views/ABViewLayout.js";
 // import Import_ABViewList from "../platform/views/ABViewList.js";
-
+// import Import_ABViewMenu from "../platform/views/ABViewMenu.js";
 
 // import Import_ABViewPDFImporter from "../platform/views/ABViewPDFImporter.js";
 // import Import_ABViewPivot from "../platform/views/ABViewPivot.js";
@@ -12621,8 +12621,8 @@ __webpack_require__.r(__webpack_exports__);
 // import Import_ABViewText from "../platform/views/ABViewText.js";
 // import Import_ABViewGantt from "../platform/views/ABViewGantt.js";
 // import Import_ABViewKanban from "../platform/views/ABViewKanban.js";
-
-
+// import Import_ABViewReportsManager from "../platform/views/ABViewReportsManager.js";
+// import Import_ABViewScheduler from "../platform/views/ABViewScheduler.js";
 // import Import_ABViewDetail from "../platform/views/ABViewDetail.js";
 // import Import_ABViewDetailCheckbox from "../platform/views/ABViewDetailCheckbox.js";
 // import Import_ABViewDetailConnect from "../platform/views/ABViewDetailConnect.js";
@@ -12662,12 +12662,12 @@ var AllViews = [
    // Import_ABViewChartLine,
    // Import_ABViewChartPie,
    // Import_ABViewComment,
-   _platform_views_ABViewConditionalContainer_js__WEBPACK_IMPORTED_MODULE_1__["default"],
-   _platform_views_ABViewConnectDataFilter_js__WEBPACK_IMPORTED_MODULE_2__["default"],
-   _platform_views_ABViewContainer_js__WEBPACK_IMPORTED_MODULE_3__["default"],
+   // Import_ABViewConditionalContainer,
+   // Import_ABViewConnectDataFilter,
+   // Import_ABViewContainer,
    // Import_ABViewCSVExporter,
    // Import_ABViewCSVImporter,
-   _platform_views_ABViewDataFilter_js__WEBPACK_IMPORTED_MODULE_4__["default"],
+   // Import_ABViewDataFilter,
    // Import_ABViewDataSelect,
    // Import_ABViewDataview,
    // Import_ABViewDocxBuilder,
@@ -12676,8 +12676,8 @@ var AllViews = [
    // Import_ABViewLabel,
    // Import_ABViewLayout,
    // Import_ABViewList,
-   _platform_views_ABViewMenu_js__WEBPACK_IMPORTED_MODULE_5__["default"],
-   _platform_views_ABViewPage_js__WEBPACK_IMPORTED_MODULE_6__["default"],
+   // Import_ABViewMenu,
+   _platform_views_ABViewPage_js__WEBPACK_IMPORTED_MODULE_1__["default"],
    // Import_ABViewPDFImporter,
    // Import_ABViewPivot,
    // Import_ABViewTab,
@@ -12688,8 +12688,8 @@ var AllViews = [
    //
    // Import_ABViewGantt,
    // Import_ABViewKanban,
-   _platform_views_ABViewReportsManager_js__WEBPACK_IMPORTED_MODULE_7__["default"],
-   _platform_views_ABViewScheduler_js__WEBPACK_IMPORTED_MODULE_8__["default"],
+   // Import_ABViewReportsManager,
+   // Import_ABViewScheduler,
 
    // //
    // // Detail Components
@@ -12773,7 +12773,7 @@ class ABViewManagerCore {
                      " (" +
                      values.name +
                      ")" +
-                     "] not yet defined.  Have an ABView instead:"
+                     "] not yet defined.  Have an ABView instead:",
                );
             }
             return new Views["view"](values, application, parent);
@@ -29201,148 +29201,6 @@ ABQLSetSaveCore.NextQLOps = [];
 
 /***/ },
 
-/***/ 42939
-/*!*****************************************************************!*\
-  !*** ./AppBuilder/core/views/ABViewConditionalContainerCore.js ***!
-  \*****************************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ ABViewConditionalContainerCore)
-/* harmony export */ });
-/* harmony import */ var _platform_views_ABViewContainer_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../platform/views/ABViewContainer.js */ 76528);
-
-
-const ABViewPropertyDefaults = {
-   dataviewID: null,
-   filterConditions: {},
-};
-
-const ABViewDefaults = {
-   key: "conditionalcontainer", // unique key identifier for this ABView
-   icon: "shield", // icon reference: (without 'fa-' )
-   labelKey: "Conditional Container", // {string} the multilingual label key for the class label
-};
-
-class ABViewConditionalContainerCore extends _platform_views_ABViewContainer_js__WEBPACK_IMPORTED_MODULE_0__["default"] {
-   constructor(values, application, parent, defaultValues) {
-      super(values, application, parent, defaultValues || ABViewDefaults);
-
-      const L = (...params) => this.AB.Multilingual.label(...params);
-
-      // the conditional container always has 'If' and 'Else' panels
-      if (this.views((v) => v instanceof _platform_views_ABViewContainer_js__WEBPACK_IMPORTED_MODULE_0__["default"]).length < 2) {
-         this._views = [];
-
-         // 'If' panel
-         const ifPanel = application.viewNew(
-            {
-               key: _platform_views_ABViewContainer_js__WEBPACK_IMPORTED_MODULE_0__["default"].common().key,
-               label: L("If"),
-               name: "If",
-               settings: {
-                  removable: false,
-               },
-            },
-            this,
-         );
-
-         this._views.push(ifPanel);
-
-         // 'Else' panel
-         const elsePanel = application.viewNew(
-            {
-               key: _platform_views_ABViewContainer_js__WEBPACK_IMPORTED_MODULE_0__["default"].common().key,
-               label: L("Else"),
-               name: "Else",
-               settings: {
-                  removable: false,
-               },
-            },
-            this,
-         );
-
-         this._views.push(elsePanel);
-      }
-   }
-
-   static common() {
-      return ABViewDefaults;
-   }
-
-   static defaultValues() {
-      return ABViewPropertyDefaults;
-   }
-
-   /**
-    * @method componentList
-    * return the list of components available on this view to display in the editor.
-    * For a Conditional Container, we don't allow any other items to be placed on it.
-    */
-   componentList() {
-      return [];
-   }
-}
-
-
-/***/ },
-
-/***/ 39508
-/*!**************************************************************!*\
-  !*** ./AppBuilder/core/views/ABViewConnectDataFilterCore.js ***!
-  \**************************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ ABViewConnectDataFilterCore)
-/* harmony export */ });
-/* harmony import */ var _platform_views_ABViewWidget_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../platform/views/ABViewWidget.js */ 87039);
-
-
-const ABViewConnectDataFilterPropertyComponentDefaults = {
-   dataviewID: null, // uuid of ABDatacollection
-   field: null, // uuid
-};
-
-const ABViewDefaults = {
-   key: "connect-data-filter", // {string} unique key for this view
-   icon: "filter", // {string} fa-[icon] reference for this view
-   labelKey: "Connected Data Filter", // {string} the multilingual label key for the class label
-};
-
-class ABViewConnectDataFilterCore extends _platform_views_ABViewWidget_js__WEBPACK_IMPORTED_MODULE_0__["default"] {
-   constructor(values, application, parent, defaultValues) {
-      super(values, application, parent, defaultValues ?? ABViewDefaults);
-   }
-
-   static common() {
-      return ABViewDefaults;
-   }
-
-   static defaultValues() {
-      return ABViewConnectDataFilterPropertyComponentDefaults;
-   }
-
-   ///
-   /// Instance Methods
-   ///
-
-   /**
-    * @method componentList
-    * return the list of components available on this view to display in the editor.
-    */
-   componentList() {
-      return [];
-   }
-}
-
-
-/***/ },
-
 /***/ 68091
 /*!******************************************************!*\
   !*** ./AppBuilder/core/views/ABViewContainerCore.js ***!
@@ -30435,396 +30293,6 @@ class ABViewCore extends _platform_ABMLClass_js__WEBPACK_IMPORTED_MODULE_0__["de
 
 /***/ },
 
-/***/ 79382
-/*!*******************************************************!*\
-  !*** ./AppBuilder/core/views/ABViewDataFilterCore.js ***!
-  \*******************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ ABViewDataFilterCore)
-/* harmony export */ });
-/* harmony import */ var _platform_views_ABViewWidget_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../platform/views/ABViewWidget.js */ 87039);
-
-
-const ABViewDataFilterPropertyComponentDefaults = {
-   dataviewID: null, // uuid of ABDatacollection
-   field: null, // uuid,
-   viewType: "advanced",
-   showFilter: 1,
-   showSort: 1,
-};
-
-const ABViewDefaults = {
-   key: "data-filter", // {string} unique key for this view
-   icon: "filter", // {string} fa-[icon] reference for this view
-   labelKey: "Data Filter", // {string} the multilingual label key for the class label
-};
-
-class ABViewDataFilterCore extends _platform_views_ABViewWidget_js__WEBPACK_IMPORTED_MODULE_0__["default"] {
-   constructor(values, application, parent, defaultValues) {
-      super(values, application, parent, defaultValues ?? ABViewDefaults);
-   }
-
-   static common() {
-      return ABViewDefaults;
-   }
-
-   static defaultValues() {
-      return ABViewDataFilterPropertyComponentDefaults;
-   }
-
-   ///
-   /// Instance Methods
-   ///
-
-   /**
-    * @method fromValues()
-    *
-    * initialze this object with the given set of values.
-    * @param {obj} values
-    */
-   fromValues(values) {
-      super.fromValues(values);
-   }
-
-   /**
-    * @method componentList
-    * return the list of components available on this view to display in the editor.
-    */
-   componentList() {
-      return [];
-   }
-}
-
-
-/***/ },
-
-/***/ 65419
-/*!*************************************************!*\
-  !*** ./AppBuilder/core/views/ABViewMenuCore.js ***!
-  \*************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ ABViewMenuCore)
-/* harmony export */ });
-/* harmony import */ var _platform_views_ABViewWidget_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../platform/views/ABViewWidget.js */ 87039);
-
-
-const ABViewMenuPropertyComponentDefaults = {
-   orientation: "x",
-   buttonStyle: "ab-menu-default",
-   menuAlignment: "ab-menu-left",
-   menuInToolbar: 1,
-   menuPadding: 10,
-   menuTheme: "bg_gray",
-   menuPosition: "left",
-   menuTextLeft: "",
-   menuTextRight: "",
-   menuTextCenter: "",
-   // [
-   // 		{
-   //			pageId: uuid,
-   //			tabId: uuid,
-   //			type: string, // "page", "tab"
-   //			isChecked: bool,
-   //			aliasname: string,
-   //			translations: []
-   //		}
-   // ]
-   pages: [],
-   order: [],
-};
-
-const ABMenuDefaults = {
-   key: "menu", // {string} unique key for this view
-   icon: "th-large", // {string} fa-[icon] reference for this view
-   labelKey: "Menu", // {string} the multilingual label key for the class label
-};
-
-class ABViewMenuCore extends _platform_views_ABViewWidget_js__WEBPACK_IMPORTED_MODULE_0__["default"] {
-   /**
-    * @param {obj} values  key=>value hash of ABView values
-    * @param {ABApplication} application the application object this view is under
-    * @param {ABViewWidget} parent the ABViewWidget this view is a child of. (can be null)
-    */
-   constructor(values, application, parent, defaultValues) {
-      super(values, application, parent, defaultValues || ABMenuDefaults);
-   }
-
-   static common() {
-      return ABMenuDefaults;
-   }
-
-   static defaultValues() {
-      return ABViewMenuPropertyComponentDefaults;
-   }
-
-   ///
-   /// Instance Methods
-   ///
-
-   /**
-    * @method toObj()
-    *
-    * properly compile the current state of this ABViewMenu instance
-    * into the values needed for saving.
-    *
-    * @return {json}
-    */
-   toObj() {
-      this.unTranslate(this, this, [
-         "menuTextLeft",
-         "menuTextCenter",
-         "menuTextRight",
-      ]);
-      if (this.settings.pages) {
-         this.settings.pages.forEach((page) => {
-            this.unTranslate(page, page, ["aliasname"]);
-         });
-      }
-
-      var obj = super.toObj();
-      obj.viewIDs = [];
-      return obj;
-   }
-
-   /**
-    * @method fromValues()
-    *
-    * initialze this object with the given set of values.
-    * @param {obj} values
-    */
-   fromValues(values) {
-      super.fromValues(values);
-
-      this.translate(this, this, [
-         "menuTextLeft",
-         "menuTextCenter",
-         "menuTextRight",
-      ]);
-
-      this.settings.pages =
-         this.settings.pages || ABViewMenuPropertyComponentDefaults.pages;
-
-      for (var i = 0; i < this.settings.pages.length; i++) {
-         var page = this.settings.pages[i];
-         if (page instanceof Object) {
-            page.isChecked = JSON.parse(page.isChecked || false);
-
-            this.translate(page, page, ["aliasname"]);
-         }
-         // Compatible with old data
-         else if (typeof page == "string") {
-            this.settings.pages[i] = {
-               pageId: page,
-               isChecked: true,
-            };
-         }
-      }
-   }
-
-   /**
-    * @method componentList
-    * return the list of components available on this view to display in the editor.
-    */
-   componentList() {
-      return [];
-   }
-
-   ClearPagesInView(view) {
-      // clear menu items
-      if (view && view.count() > 1) {
-         view.find({}).forEach((item) => {
-            view.remove(item.id);
-         });
-      }
-   }
-
-   /**
-    * @property datacollection
-    * return data source
-    * NOTE: this view doesn't track a DataCollection.
-    * @return {ABDataCollection}
-    */
-   get datacollection() {
-      return null;
-   }
-
-   AddPagesToView(view, pages) {
-      if (!view || !pages) return;
-
-      (pages || []).forEach((displayPage) => {
-         if (displayPage.isChecked) {
-            let existsPage = this.application.pages(
-               (p) => p.id == displayPage.pageId,
-               true,
-            )[0];
-            if (!existsPage) return;
-
-            var pageAccessLevel = existsPage.getUserAccess();
-            if (pageAccessLevel == 0) return;
-
-            if (displayPage.tabId) {
-               let existsTab = this.application.views(
-                  (v) => v.id == displayPage.tabId,
-                  true,
-               )[0];
-               if (!existsTab) return;
-
-               var tabAccessLevel = existsTab.getUserAccess();
-               if (tabAccessLevel == 0) return;
-            }
-
-            let label = this.getAliasname(displayPage);
-            // create a temporaty store for the menu item
-            var menuItem;
-            // check if page has a parent or not
-            if (displayPage.parent && displayPage.parent != "0") {
-               // if page has a parent attempt to grab its submenu
-               menuItem = view.getSubMenu(displayPage.parent);
-            } else {
-               // if the page doesn't have parent use the current menu
-               menuItem = view;
-            }
-            // if the menu item doesn't have a menu selected find it
-            if (menuItem == null) {
-               // get the menu item
-               var curMenu = view.getMenuItem(displayPage.parent);
-               // create a submenu placeholder
-               curMenu.submenu = [];
-               // update the menu with the new submenu included
-               view.refresh(displayPage.parent);
-               // get the submenu we just created
-               menuItem = view.getSubMenu(displayPage.parent);
-            }
-            if (menuItem.exists(displayPage.tabId || displayPage.pageId))
-               return;
-            // add a new item to the menu/submenu
-            menuItem.add(
-               {
-                  id: displayPage.tabId || displayPage.pageId,
-                  value: label,
-                  type: displayPage.type,
-                  pageId: displayPage.pageId,
-                  icon: displayPage.icon
-                     ? "fa fa-fw fa-" + displayPage.icon
-                     : "",
-               },
-               displayPage.position ? parseInt(displayPage.position) : 0,
-            );
-         }
-      });
-   }
-
-   /**
-    * @method getAliasname
-    * @param pageInfo - an object in settings
-    * {
-    * 	pageId: uuid,
-    * 	tabId: uuid,
-    * 	type: string, - "page" or "tab"
-    * 	isChecked: bool,
-    * 	aliasname: string,
-    *	translations: []
-    *}
-    *
-    * @return {string}
-    */
-   getAliasname(pageInfo) {
-      var lang = this.AB.Multilingual.currentLanguage();
-      var translation = pageInfo.translations.filter((t) => {
-         return t.language_code == lang;
-      });
-
-      var label = "";
-
-      if (translation.length) {
-         if (translation[0].aliasname) {
-            label = translation[0].aliasname;
-         } else if (translation[0].label) {
-            label = translation[0].label;
-         }
-      }
-
-      // Just in case there isn't one stored in the translations yet
-      if (!label && pageInfo.aliasname) {
-         label = pageInfo.aliasname;
-      }
-
-      // if alias is empty, then find label of page or tab
-      if (
-         !label ||
-         // remove [en] or [th] etc.
-         !label.replace(/\[.{2,}\]/g, "")
-      ) {
-         // first check to see if we are actually on a page
-         // if not recursivly look up for the nearest parent page
-         var pageId;
-         if (pageInfo.pageId) {
-            pageId = pageInfo.pageId;
-         } else {
-            pageId = this.getParentPageId(pageInfo);
-         }
-         // find label of the actual page
-         var page = this.application.pages((p) => p.id == pageId, true)[0];
-         if (page) {
-            // find label of the tab view
-            if (pageInfo.type == "tab" || pageInfo.key == "viewcontainer") {
-               var tabView = page.views(
-                  (v) => v.id == pageInfo.tabId || v.id == pageInfo.id,
-                  true,
-               )[0];
-               if (tabView) {
-                  label = tabView.label;
-               }
-            } else {
-               label = page.label;
-            }
-         }
-      }
-
-      return label;
-   }
-
-   getParentPageId(currentView) {
-      if (currentView.key != "page") {
-         return this.getParentPageId(currentView.parent);
-      } else {
-         return currentView.id;
-      }
-   }
-
-   copy(lookUpIds, parent) {
-      return super.copy(lookUpIds, parent).then((result) => {
-         // update ids of page's settings
-         (result.settings.pages || []).forEach((p, i) => {
-            let page = result.settings.pages[i];
-
-            // Compatible with old data
-            if (typeof page == "string") {
-               result.settings.pages[i] = lookUpIds[page];
-            } else {
-               page.pageId = lookUpIds[page.pageId];
-               page.tabId = lookUpIds[page.tabId];
-            }
-         });
-
-         return result.save().then(() => {
-            return result;
-         });
-      });
-   }
-}
-
-
-/***/ },
-
 /***/ 36183
 /*!*************************************************!*\
   !*** ./AppBuilder/core/views/ABViewPageCore.js ***!
@@ -31306,297 +30774,6 @@ class ABViewPageCore extends _platform_views_ABViewContainer_js__WEBPACK_IMPORTE
 
       // now continue with the default .copy()
       return super.copy(lookUpIds, parent, options);
-   }
-}
-
-
-/***/ },
-
-/***/ 74238
-/*!***********************************************************!*\
-  !*** ./AppBuilder/core/views/ABViewReportsManagerCore.js ***!
-  \***********************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ ABViewReportsManagerCore)
-/* harmony export */ });
-/* harmony import */ var _platform_views_ABViewWidget_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../platform/views/ABViewWidget.js */ 87039);
-
-
-const ABViewReportManagerPropertyComponentDefaults = {
-   dataviewID: "",
-   dataviewFields: {
-      name: "", // id of a String field
-      text: "", // id of a LongText field
-      queries: "", // id of a json field
-   },
-   datacollectionIDs: [],
-   editMode: 0,
-   hideCommonTab: 0,
-   hideDataTab: 0,
-   hideViewTab: 0,
-};
-
-const ABViewDefaults = {
-   key: "reportsManager", // {string} unique key for this view
-   icon: "wpforms", // {string} fa-[icon] reference for this view
-   labelKey: "Reports Manager", // {string} the multilingual label key for the class label
-};
-
-class ABViewReportsManagerCore extends _platform_views_ABViewWidget_js__WEBPACK_IMPORTED_MODULE_0__["default"] {
-   constructor(values, application, parent, defaultValues) {
-      super(values, application, parent, defaultValues || ABViewDefaults);
-   }
-
-   static common() {
-      return ABViewDefaults;
-   }
-
-   static defaultValues() {
-      return ABViewReportManagerPropertyComponentDefaults;
-   }
-
-   ///
-   /// Instance Methods
-   ///
-
-   /**
-    * @method fromValues()
-    *
-    * initialze this object with the given set of values.
-    * @param {obj} values
-    */
-   fromValues(values) {
-      super.fromValues(values);
-
-      const parsedSettings = {};
-
-      Object.keys(ABViewReportManagerPropertyComponentDefaults).forEach(
-         (key1) => {
-            if (
-               typeof ABViewReportManagerPropertyComponentDefaults[key1] ===
-                  "object" &&
-               !Array.isArray(
-                  ABViewReportManagerPropertyComponentDefaults[key1],
-               )
-            ) {
-               parsedSettings[key1] = {};
-
-               Object.keys(
-                  ABViewReportManagerPropertyComponentDefaults[key1],
-               ).forEach((key2) => {
-                  parsedSettings[key1][key2] =
-                     this.settings[key1]?.[key2] ??
-                     ABViewReportManagerPropertyComponentDefaults[key1][key2];
-               });
-
-               return;
-            }
-
-            parsedSettings[key1] =
-               this.settings[key1] ??
-               ABViewReportManagerPropertyComponentDefaults[key1];
-         },
-      );
-
-      this.settings = parsedSettings;
-   }
-
-   /**
-    * @method toObj()
-    *
-    * properly compile the current state of this ABViewLabel instance
-    * into the values needed for saving.
-    *
-    * @return {json}
-    */
-   toObj() {
-      var obj = super.toObj();
-
-      obj.settings = obj.settings || {};
-
-      return obj;
-   }
-
-   /**
-    * @method componentList
-    * return the list of components available on this view to display in the editor.
-    */
-   componentList() {
-      return [];
-   }
-}
-
-
-/***/ },
-
-/***/ 74441
-/*!******************************************************!*\
-  !*** ./AppBuilder/core/views/ABViewSchedulerCore.js ***!
-  \******************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ ABViewSchedulerCore)
-/* harmony export */ });
-/* harmony import */ var _platform_views_ABViewWidget_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../platform/views/ABViewWidget.js */ 87039);
-
-
-const ABViewSchedulerPropertyComponentDefaults = {
-   readonly: 0,
-   dataviewID: "",
-   dataviewFields: {
-      name: "", // id of a String field
-      start: "", // id of a DateTime field
-      end: "", // id of a DateTime field
-      allDay: "", // id of a Checkbox field
-      repeat: "", // id of a String field
-      calendar: "", // id of a String field
-      color: "", // id of a String field
-      sectionID: "", // id of a String field
-      unitID: "", // id of a String field
-      notes: "", // id of a LongText field
-      originID: "", // id of a LongText field
-   },
-   calendarDataviewID: "",
-   calendarDataviewFields: {
-      title: "", // id of a String field
-      color: "", // id of a String field
-      active: "", // id of a Checkbox field
-   },
-   timeline: {
-      day: 1,
-      week: 1,
-      month: 1,
-      year: 1,
-      agenda: 1,
-      timeline: 1,
-      units: 1,
-   },
-   timelineSectionList: "",
-   unitList: "",
-   export: {
-      excel: 0,
-      csv: 0,
-      pdf: 0,
-   },
-};
-
-const ABViewDefaults = {
-   key: "scheduler",
-   // {string}
-   // unique key for this view
-
-   icon: "calendar",
-   // {string}
-   // fa-[icon] reference for this view
-
-   labelKey: "Scheduler",
-   // {string}
-   // the multilingual label key for the class label
-};
-
-class ABViewSchedulerCore extends _platform_views_ABViewWidget_js__WEBPACK_IMPORTED_MODULE_0__["default"] {
-   constructor(values, application, parent, defaultValues) {
-      super(values, application, parent, defaultValues || ABViewDefaults);
-
-      this._object = null;
-   }
-
-   static common() {
-      return ABViewDefaults;
-   }
-
-   static defaultValues() {
-      return ABViewSchedulerPropertyComponentDefaults;
-   }
-
-   ///
-   /// Instance Methods
-   ///
-
-   /**
-    * @method toObj()
-    *
-    * properly compile the current state of this ABViewLabel instance
-    * into the values needed for saving.
-    *
-    * @return {json}
-    */
-   toObj() {
-      // NOTE: ABView auto translates/untranslates "label"
-      // add in any additional fields here:
-      this.unTranslate(this, this, ["scheduler"]);
-
-      const obj = super.toObj();
-
-      obj.views = [];
-
-      return obj;
-   }
-
-   /**
-    * @method fromValues()
-    *
-    * initialze this object with the given set of values.
-    * @param {obj} values
-    */
-   fromValues(values) {
-      super.fromValues(values);
-
-      this.settings = this.settings || {};
-      this.settings.dataviewFields = this.settings.dataviewFields || {};
-      this.settings.calendarDataviewFields =
-         this.settings.calendarDataviewFields || {};
-      this.settings.timeline = this.settings.timeline || {};
-      this.settings.export = this.settings.export || {};
-
-      const parsedSettings = {};
-
-      Object.keys(ABViewSchedulerPropertyComponentDefaults).forEach((key1) => {
-         if (
-            typeof ABViewSchedulerPropertyComponentDefaults[key1] === "object"
-         ) {
-            parsedSettings[key1] = {};
-
-            Object.keys(ABViewSchedulerPropertyComponentDefaults[key1]).forEach(
-               (key2) => {
-                  parsedSettings[key1][key2] =
-                     this.settings[key1][key2] ??
-                     ABViewSchedulerPropertyComponentDefaults[key1][key2];
-               },
-            );
-
-            return;
-         }
-
-         parsedSettings[key1] =
-            this.settings[key1] ??
-            ABViewSchedulerPropertyComponentDefaults[key1];
-      });
-
-      this.settings = parsedSettings;
-
-      // if this is being instantiated on a read from the Property UI,
-      this.scheduler =
-         values.scheduler || ABViewSchedulerPropertyComponentDefaults.scheduler;
-
-      // NOTE: ABView auto translates/untranslates "label"
-      // add in any additional fields here:
-      this.translate(this, this, ["scheduler"]);
-   }
-
-   /**
-    * @method componentList
-    * return the list of components available on this view to display in the editor.
-    */
-   componentList() {
-      return [];
    }
 }
 
@@ -32221,11 +31398,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _views_viewProperties_ABViewPropertyAddPage__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./views/viewProperties/ABViewPropertyAddPage */ 64947);
 /* harmony import */ var _views_viewProperties_ABViewPropertyEditPage__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./views/viewProperties/ABViewPropertyEditPage */ 24904);
 /* harmony import */ var _views_ABViewPopupSortFields_js__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./views/ABViewPopupSortFields.js */ 49000);
-/* harmony import */ var _views_viewProperties_ABViewPropertyFilterData__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./views/viewProperties/ABViewPropertyFilterData */ 95889);
-/* harmony import */ var _views_viewProperties_ABViewPropertyLinkPage__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./views/viewProperties/ABViewPropertyLinkPage */ 42588);
-/* harmony import */ var _rules_ABViewRuleListFormRecordRules__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ../rules/ABViewRuleListFormRecordRules */ 1148);
-/* harmony import */ var _rules_ABViewRuleListFormSubmitRules__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ../rules/ABViewRuleListFormSubmitRules */ 41171);
-/* harmony import */ var _plugins_ABViewWidgetPlugin_js__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./plugins/ABViewWidgetPlugin.js */ 76554);
+/* harmony import */ var _rules_ABViewRuleListFormRecordRules__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../rules/ABViewRuleListFormRecordRules */ 1148);
+/* harmony import */ var _rules_ABViewRuleListFormSubmitRules__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ../rules/ABViewRuleListFormSubmitRules */ 41171);
+/* harmony import */ var _plugins_ABViewWidgetPlugin_js__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./plugins/ABViewWidgetPlugin.js */ 76554);
 
 
 
@@ -32240,9 +31415,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
-
-// view property helpers used by plugins
 
 
 
@@ -32292,16 +31464,14 @@ function getPluginAPI() {
       ABObjectPlugin: _plugins_ABObjectPlugin_js__WEBPACK_IMPORTED_MODULE_2__["default"],
       ABModelPlugin: _plugins_ABModelPlugin_js__WEBPACK_IMPORTED_MODULE_1__["default"],
       ABViewPlugin: _plugins_ABViewPlugin_js__WEBPACK_IMPORTED_MODULE_10__["default"],
-      ABViewWidgetPlugin: _plugins_ABViewWidgetPlugin_js__WEBPACK_IMPORTED_MODULE_19__["default"],
+      ABViewWidgetPlugin: _plugins_ABViewWidgetPlugin_js__WEBPACK_IMPORTED_MODULE_17__["default"],
       ABViewComponentPlugin: _plugins_ABViewComponentPlugin_js__WEBPACK_IMPORTED_MODULE_5__["default"],
       ABViewPropertiesPlugin: _plugins_ABViewPropertiesPlugin_js__WEBPACK_IMPORTED_MODULE_11__["default"],
       ABViewEditorPlugin: _plugins_ABViewEditorPlugin_js__WEBPACK_IMPORTED_MODULE_8__["default"],
       ABViewContainer: _views_ABViewContainer_js__WEBPACK_IMPORTED_MODULE_6__["default"],
       ABViewContainerComponent: _views_viewComponent_ABViewContainerComponent_js__WEBPACK_IMPORTED_MODULE_7__["default"],
-      ABViewPropertyFilterData: _views_viewProperties_ABViewPropertyFilterData__WEBPACK_IMPORTED_MODULE_15__["default"],
-      ABViewPropertyLinkPage: _views_viewProperties_ABViewPropertyLinkPage__WEBPACK_IMPORTED_MODULE_16__["default"],
-      ABViewRuleListFormRecordRules: _rules_ABViewRuleListFormRecordRules__WEBPACK_IMPORTED_MODULE_17__["default"],
-      ABViewRuleListFormSubmitRules: _rules_ABViewRuleListFormSubmitRules__WEBPACK_IMPORTED_MODULE_18__["default"],
+      ABViewRuleListFormRecordRules: _rules_ABViewRuleListFormRecordRules__WEBPACK_IMPORTED_MODULE_15__["default"],
+      ABViewRuleListFormSubmitRules: _rules_ABViewRuleListFormSubmitRules__WEBPACK_IMPORTED_MODULE_16__["default"],
       ABViewPropertyAddPage: _views_viewProperties_ABViewPropertyAddPage__WEBPACK_IMPORTED_MODULE_12__["default"],
       ABViewPropertyEditPage: _views_viewProperties_ABViewPropertyEditPage__WEBPACK_IMPORTED_MODULE_13__["default"],
       ABFieldImage: _dataFields_ABFieldImage__WEBPACK_IMPORTED_MODULE_0__["default"],
@@ -32395,7 +31565,7 @@ function pluginRegister(pluginClass) {
          break;
       default:
          throw new Error(
-            `ABClassManager.pluginRegister():: Unknown plugin type: ${type}`
+            `ABClassManager.pluginRegister():: Unknown plugin type: ${type}`,
          );
    }
 }
@@ -44046,6 +43216,7 @@ function _getSelectedOptions(field, rowData = {}) {
                ).length > 0
             );
          });
+
       }
    }
 
@@ -46604,293 +45775,6 @@ class ABMobileViewTimeline extends _core_mobile_ABMobileViewTimelineCore__WEBPAC
 
 /***/ },
 
-/***/ 56419
-/*!********************************************************!*\
-  !*** ./AppBuilder/platform/plugins/ABClassUIPlugin.js ***!
-  \********************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ ABClassUIPlugin)
-/* harmony export */ });
-/* harmony import */ var _ui_ClassUI_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../ui/ClassUI.js */ 93692);
-
-
-class ABClassUIPlugin extends _ui_ClassUI_js__WEBPACK_IMPORTED_MODULE_0__["default"] {
-   constructor(base = "class_ui", ids = {}) {
-      // base: {string} unique base id reference
-      // ids: {hash}  { key => '' }
-      // this is provided by the Sub Class and has the keys
-      // unique to the Sub Class' interface elements.
-
-      super(base, ids);
-
-      this.base = base;
-
-      this.AB = null;
-      // {ABFactory}
-      // Our common ABFactory for our application.
-      // Should be set via init(AB) method
-
-      this.CurrentApplicationID = null;
-      // {string} uuid
-      // The current ABApplication.id we are working with.
-
-      this.CurrentDatacollectionID = null;
-      // {string}
-      // the ABDataCollection.id of the datacollection we are working with.
-
-      this.CurrentObjectID = null;
-      // {string}
-      // the ABObject.id of the object we are working with.
-
-      this.CurrentProcessID = null;
-      // {string}
-      // the ABProcess.id of the process we are working with.
-
-      this.CurrentQueryID = null;
-      // {string}
-      // the ABObjectQuery.id of the query we are working with.
-
-      this.CurrentViewID = null;
-      // {string}
-      // the ABView.id of the view we are working with.
-
-      this.CurrentVersionID = null;
-      // {string}
-      // the ABVersion.id of the version we are working with.
-   }
-
-   /**
-    * @method static L()
-    * A static method to return a multilingual label function.
-    * NOTE: Sub classes should override this to provide their plugin name.
-    * @return {function} A function that returns multilingual labels
-    */
-   // static L() {
-   //    return function (...params) {
-   //       // Default implementation - sub classes should override
-   //       return params[0] || "";
-   //    };
-   // }
-
-   /**
-    * @function applicationLoad
-    * save the ABApplication.id of the current application.
-    * @param {ABApplication} app
-    */
-   applicationLoad(app) {
-      this.CurrentApplicationID = app?.id;
-   }
-
-   /**
-    * @function datacollectionLoad
-    * save the ABDataCollection.id of the current datacollection.
-    * @param {ABDataCollection} dc
-    */
-   datacollectionLoad(dc) {
-      this.CurrentDatacollectionID = dc?.id;
-   }
-
-   /**
-    * @function objectLoad
-    * save the ABObject.id of the current object.
-    * @param {ABObject} obj
-    */
-   objectLoad(obj) {
-      this.CurrentObjectID = obj?.id;
-   }
-
-   /**
-    * @function processLoad
-    * save the ABProcess.id of the current process.
-    * @param {ABProcess} process
-    */
-   processLoad(process) {
-      this.CurrentProcessID = process?.id;
-   }
-
-   /**
-    * @function queryLoad
-    * save the ABObjectQuery.id of the current query.
-    * @param {ABObjectQuery} query
-    */
-   queryLoad(query) {
-      this.CurrentQueryID = query?.id;
-   }
-
-   /**
-    * @function versionLoad
-    * save the ABVersion.id of the current version.
-    * @param {ABVersion} version
-    */
-   versionLoad(version) {
-      this.CurrentVersionID = version?.id;
-   }
-
-   /**
-    * @function viewLoad
-    * save the ABView.id of the current view.
-    * @param {ABView} view
-    */
-   viewLoad(view) {
-      this.CurrentViewID = view?.id;
-
-      if (view?.application) {
-         this.applicationLoad(view.application);
-      }
-   }
-
-   /**
-    * @method CurrentApplication
-    * return the current ABApplication being worked on.
-    * @return {ABApplication} application
-    */
-   get CurrentApplication() {
-      return this.AB?.applicationByID(this.CurrentApplicationID);
-   }
-
-   /**
-    * @method CurrentDatacollection()
-    * A helper to return the current ABDataCollection we are working with.
-    * @return {ABDataCollection}
-    */
-   get CurrentDatacollection() {
-      return this.AB?.datacollectionByID(this.CurrentDatacollectionID);
-   }
-
-   /**
-    * @method CurrentObject()
-    * A helper to return the current ABObject we are working with.
-    * @return {ABObject}
-    */
-   get CurrentObject() {
-      let obj = this.AB?.objectByID(this.CurrentObjectID);
-      if (!obj) {
-         obj = this.AB?.queryByID(this.CurrentObjectID);
-      }
-      return obj;
-   }
-
-   /**
-    * @method CurrentProcess()
-    * A helper to return the current ABProcess we are working with.
-    * @return {ABProcess}
-    */
-   get CurrentProcess() {
-      return this.AB?.processByID(this.CurrentProcessID);
-   }
-
-   /**
-    * @method CurrentQuery()
-    * A helper to return the current ABObjectQuery we are working with.
-    * @return {ABObjectQuery}
-    */
-   get CurrentQuery() {
-      return this.AB?.queryByID(this.CurrentQueryID);
-   }
-
-   /**
-    * @method CurrentView()
-    * A helper to return the current ABView we are working with.
-    * @return {ABView}
-    */
-   get CurrentView() {
-      return this.CurrentApplication?.views(
-         (v) => v.id == this.CurrentViewID
-      )?.[0];
-   }
-
-   /**
-    * @method CurrentVersion()
-    * A helper to return the current ABVersion we are working with.
-    * @return {ABVersion}
-    */
-   // get CurrentVersion() {
-   //    return this.AB?.versionByID?.(this.CurrentVersionID);
-   // }
-
-   /**
-    * @method datacollectionsIncluded()
-    * return a list of datacollections that are included in the current
-    * application.
-    * @return [{id, value, icon}]
-    *         id: {string} the ABDataCollection.id
-    *         value: {string} the label of the ABDataCollection
-    *         icon: {string} the icon to display
-    */
-   datacollectionsIncluded() {
-      return (this.CurrentApplication?.datacollectionsIncluded() || [])
-         .filter((dc) => {
-            const obj = dc.datasource;
-            return (
-               dc.sourceType == "object" && !obj?.isImported && !obj?.isReadOnly
-            );
-         })
-         .map((d) => {
-            let entry = { id: d.id, value: d.label };
-            if (d.sourceType == "query") {
-               entry.icon = "fa fa-filter";
-            } else {
-               entry.icon = "fa fa-database";
-            }
-            return entry;
-         });
-   }
-
-   /**
-    * @method uniqueIDs()
-    * add a unique identifier to each of our this.ids to ensure they are
-    * unique.  Useful for components that are repeated, like items in a list.
-    */
-   uniqueIDs() {
-      let uniqueInstanceID = webix.uid();
-      Object.keys(this.ids).forEach((k) => {
-         this.ids[k] = `${this.ids[k]}_${uniqueInstanceID}`;
-      });
-   }
-
-   /**
-    * @method warningsRefresh()
-    * reset the warnings on the provided ABObject and then start propogating
-    * the "warnings" display updates.
-    * @param {ABObject} ABObject
-    */
-   warningsRefresh(ABObject) {
-      ABObject?.warningsEval?.();
-      this.emit("warnings");
-   }
-
-   /**
-    * @method warningsPropogate()
-    * If any of the passed in ui elements issue a "warnings" event, we will
-    * propogate that upwards.
-    * @param {Array} elements
-    *        Array of UI elements that can emit "warnings" events
-    */
-   warningsPropogate(elements = []) {
-      elements.forEach((e) => {
-         e.on("warnings", () => {
-            this.emit("warnings");
-         });
-      });
-   }
-
-   /**
-    * @method init()
-    * Initialize the plugin with the ABFactory instance.
-    * @param {ABFactory} AB
-    */
-   async init(AB) {
-      this.AB = AB;
-   }
-}
-
-
-/***/ },
-
 /***/ 84364
 /*!******************************************************!*\
   !*** ./AppBuilder/platform/plugins/ABModelPlugin.js ***!
@@ -47323,9 +46207,10 @@ class ABUIPlugin extends _ui_ClassUI_js__WEBPACK_IMPORTED_MODULE_0__["default"] 
    constructor(...params) {
       super(...params);
 
-      // this.AB = AB;
+      this.AB = this.AB ?? null;
       // {ABFactory}
       // Our common ABFactory for our application.
+      // Set via constructor (3rd ClassUI arg), init(AB), or by a subclass.
 
       this.CurrentApplicationID = null;
       // {string} uuid
@@ -47350,6 +46235,10 @@ class ABUIPlugin extends _ui_ClassUI_js__WEBPACK_IMPORTED_MODULE_0__["default"] 
       this.CurrentViewID = null;
       // {string}
       // the ABView.id of the view we are working with.
+
+      this.CurrentVersionID = null;
+      // {string}
+      // the ABVersion.id of the version we are working with.
    }
 
    static getPluginKey() {
@@ -47365,11 +46254,20 @@ class ABUIPlugin extends _ui_ClassUI_js__WEBPACK_IMPORTED_MODULE_0__["default"] 
    L() {
       let _self = this;
       return function (...params) {
-         return _self.AB.Multilingual.labelPlugin(
+         return _self.AB?.Multilingual?.labelPlugin(
             _self.constructor.getPluginKey(),
             ...params
          );
       };
+   }
+
+   /**
+    * @method init()
+    * Initialize the plugin with the ABFactory instance.
+    * @param {ABFactory} AB
+    */
+   async init(AB) {
+      this.AB = AB;
    }
 
    /**
@@ -47415,16 +46313,16 @@ class ABUIPlugin extends _ui_ClassUI_js__WEBPACK_IMPORTED_MODULE_0__["default"] 
     * @return {ABApplication} application
     */
    get CurrentApplication() {
-      return this.AB.applicationByID(this.CurrentApplicationID);
+      return this.AB?.applicationByID(this.CurrentApplicationID);
    }
 
    /**
     * @method CurrentDatacollection()
     * A helper to return the current ABDataCollection we are working with.
-    * @return {ABObject}
+    * @return {ABDataCollection}
     */
    get CurrentDatacollection() {
-      return this.AB.datacollectionByID(this.CurrentDatacollectionID);
+      return this.AB?.datacollectionByID(this.CurrentDatacollectionID);
    }
 
    /**
@@ -47433,9 +46331,9 @@ class ABUIPlugin extends _ui_ClassUI_js__WEBPACK_IMPORTED_MODULE_0__["default"] 
     * @return {ABObject}
     */
    get CurrentObject() {
-      let obj = this.AB.objectByID(this.CurrentObjectID);
+      let obj = this.AB?.objectByID(this.CurrentObjectID);
       if (!obj) {
-         obj = this.AB.queryByID(this.CurrentObjectID);
+         obj = this.AB?.queryByID(this.CurrentObjectID);
       }
       return obj;
    }
@@ -47446,7 +46344,7 @@ class ABUIPlugin extends _ui_ClassUI_js__WEBPACK_IMPORTED_MODULE_0__["default"] 
     * @return {ABProcess}
     */
    get CurrentProcess() {
-      return this.AB.processByID(this.CurrentProcessID);
+      return this.AB?.processByID(this.CurrentProcessID);
    }
 
    /**
@@ -47455,7 +46353,7 @@ class ABUIPlugin extends _ui_ClassUI_js__WEBPACK_IMPORTED_MODULE_0__["default"] 
     * @return {ABObjectQuery}
     */
    get CurrentQuery() {
-      return this.AB.queryByID(this.CurrentQueryID);
+      return this.AB?.queryByID(this.CurrentQueryID);
    }
 
    /**
@@ -47570,10 +46468,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ ABViewEditorPlugin)
 /* harmony export */ });
-/* harmony import */ var _ABClassUIPlugin_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ABClassUIPlugin.js */ 56419);
+/* harmony import */ var _ABUIPlugin_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ABUIPlugin.js */ 4341);
 
 
-class ABViewEditorPlugin extends _ABClassUIPlugin_js__WEBPACK_IMPORTED_MODULE_0__["default"] {
+class ABViewEditorPlugin extends _ABUIPlugin_js__WEBPACK_IMPORTED_MODULE_0__["default"] {
    constructor(view, base = "view_editor", ids = {}) {
       // view: {ABView} The ABView instance this editor is for
       // base: {string} unique base id reference
@@ -47755,10 +46653,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ ABViewPropertiesPlugin)
 /* harmony export */ });
-/* harmony import */ var _ABClassUIPlugin_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ABClassUIPlugin.js */ 56419);
+/* harmony import */ var _ABUIPlugin_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ABUIPlugin.js */ 4341);
 
 
-class ABViewPropertiesPlugin extends _ABClassUIPlugin_js__WEBPACK_IMPORTED_MODULE_0__["default"] {
+class ABViewPropertiesPlugin extends _ABUIPlugin_js__WEBPACK_IMPORTED_MODULE_0__["default"] {
    constructor(base = "properties_abview", ids = {}) {
       // base: {string} unique base id reference
       // ids: {hash}  { key => '' }
@@ -48048,6 +46946,119 @@ class ABViewWidgetPlugin extends _views_ABViewWidget_js__WEBPACK_IMPORTED_MODULE
          parent
       );
    }
+}
+
+
+/***/ },
+
+/***/ 41843
+/*!****************************************************************************!*\
+  !*** ./AppBuilder/platform/plugins/included/view_core/FNABViewProperty.js ***!
+  \****************************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ FNABViewProperty)
+/* harmony export */ });
+function FNABViewProperty({ ABUIPlugin }) {
+   return class ABViewProperty extends ABUIPlugin {
+      /**
+       * @property default
+       * return default settings
+       *
+       * @return {Object}
+       */
+      static get default() {
+         return {};
+      }
+
+      /** == Property == */
+      /**
+       * @function propertyComponent
+       * return the view and logic to display in property panel
+       *
+       * @return {Object} - {
+       * 						ui: webix element,
+       * 						init: function,
+       * 						logic: object
+       * 					}
+       */
+      static propertyComponent() {
+         let ui = {
+            view: "template",
+            template: "No UI",
+         };
+
+         let init = (options) => {
+            // register callbacks:
+            for (var c in logic.callbacks) {
+               logic.callbacks[c] = options[c] || logic.callbacks[c];
+            }
+         };
+
+         let logic = {
+            callbacks: {},
+         };
+
+         return {
+            ui: ui,
+            init: init,
+            logic: logic,
+         };
+      }
+
+      fromSettings(settings) {
+         this.settings = settings;
+      }
+
+      toSettings() {
+         return this.settings || {};
+      }
+
+      /** == UI == */
+      /**
+       * @function component
+       * return the view and logic to display in display widget
+       * @param {object} App
+       *      The shared App object that is created in OP.Component
+       * @param {string} idBase
+       *      Identifier for this component
+       *
+       * @return {Object} - {
+       * 						ui: webix element,
+       * 						init: function,
+       * 						logic: object
+       * 					}
+       */
+      component(App, idBase) {
+         this.App = App;
+         this.idBase = idBase;
+
+         let ui = {
+            view: "template",
+            template: "No UI",
+         };
+
+         let init = (options) => {
+            // register callbacks:
+            for (var c in logic.callbacks) {
+               logic.callbacks[c] = options[c] || logic.callbacks[c];
+            }
+         };
+
+         let logic = {
+            callbacks: {},
+         };
+
+         return {
+            ui: ui,
+            init: init,
+            logic: logic,
+         };
+      }
+   };
 }
 
 
@@ -52835,6 +51846,7 @@ class ABView extends _core_views_ABViewCore_js__WEBPACK_IMPORTED_MODULE_0__["def
          "page",
          "formpanel",
          "viewcontainer",
+         "viewwidget",
          // not allowed Detail's widgets
          "detailcheckbox",
          "detailcustom",
@@ -52925,100 +51937,6 @@ class ABView extends _core_views_ABViewCore_js__WEBPACK_IMPORTED_MODULE_0__["def
 
 /***/ },
 
-/***/ 68640
-/*!*****************************************************************!*\
-  !*** ./AppBuilder/platform/views/ABViewConditionalContainer.js ***!
-  \*****************************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ ABViewConditionalContainer)
-/* harmony export */ });
-/* harmony import */ var _core_views_ABViewConditionalContainerCore__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../core/views/ABViewConditionalContainerCore */ 42939);
-/* harmony import */ var _viewComponent_ABViewConditionalContainerComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./viewComponent/ABViewConditionalContainerComponent */ 53382);
-
-
-
-class ABViewConditionalContainer extends (
-   _core_views_ABViewConditionalContainerCore__WEBPACK_IMPORTED_MODULE_0__["default"]
-) {
-   /**
-    * @function component()
-    * return a UI component based upon this view.
-    * @return {obj} UI component
-    */
-   component() {
-      return new _viewComponent_ABViewConditionalContainerComponent__WEBPACK_IMPORTED_MODULE_1__["default"](this);
-   }
-
-   async save() {
-      const viewIf = this.views().find((v) => v.name === "If");
-      const viewElse = this.views().find((v) => v.name === "Else");
-      const pendingSave = [];
-
-      if (viewIf) pendingSave.push(viewIf.save());
-
-      if (viewElse) pendingSave.push(viewElse.save());
-
-      await Promise.all(pendingSave);
-
-      await super.save();
-   }
-
-   warningsEval() {
-      super.warningsEval();
-
-      let DC = this.datacollection;
-      if (!DC) {
-         this.warningsMessage(
-            `can't resolve it's datacollection[${this.settings.dataviewID}]`
-         );
-      }
-
-      if (
-         !this.settings.filterConditions ||
-         this.settings.filterConditions?.rules?.length == 0
-      ) {
-         this.warningsMessage("has no filter conditions set");
-      }
-   }
-};
-
-
-/***/ },
-
-/***/ 82859
-/*!**************************************************************!*\
-  !*** ./AppBuilder/platform/views/ABViewConnectDataFilter.js ***!
-  \**************************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ ABViewConnectDataFilter)
-/* harmony export */ });
-/* harmony import */ var _core_views_ABViewConnectDataFilterCore__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../core/views/ABViewConnectDataFilterCore */ 39508);
-/* harmony import */ var _viewComponent_ABViewConnectDataFilterComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./viewComponent/ABViewConnectDataFilterComponent */ 77577);
-
-
-
-class ABViewConnectDataFilter extends _core_views_ABViewConnectDataFilterCore__WEBPACK_IMPORTED_MODULE_0__["default"] {
-   /**
-    * @method component()
-    * return a UI component based upon this view.
-    * @return {obj} UI component
-    */
-   component() {
-      return new _viewComponent_ABViewConnectDataFilterComponent__WEBPACK_IMPORTED_MODULE_1__["default"](this);
-   }
-}
-
-
-/***/ },
-
 /***/ 76528
 /*!******************************************************!*\
   !*** ./AppBuilder/platform/views/ABViewContainer.js ***!
@@ -53062,88 +51980,6 @@ class ABViewContainer extends _core_views_ABViewContainerCore__WEBPACK_IMPORTED_
       // (allViews || []).forEach((v) => {
       //    v.warningsEval();
       // });
-   }
-};
-
-
-/***/ },
-
-/***/ 70153
-/*!*******************************************************!*\
-  !*** ./AppBuilder/platform/views/ABViewDataFilter.js ***!
-  \*******************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ ABViewDataFilter)
-/* harmony export */ });
-/* harmony import */ var _core_views_ABViewDataFilterCore__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../core/views/ABViewDataFilterCore */ 79382);
-/* harmony import */ var _viewComponent_ABViewDataFilterComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./viewComponent/ABViewDataFilterComponent */ 56397);
-
-
-
-class ABViewDataFilter extends _core_views_ABViewDataFilterCore__WEBPACK_IMPORTED_MODULE_0__["default"] {
-   /**
-    * @method component()
-    * return a UI component based upon this view.
-    * @param {obj} App
-    * @return {obj} UI component
-    */
-   component() {
-      return new _viewComponent_ABViewDataFilterComponent__WEBPACK_IMPORTED_MODULE_1__["default"](this);
-   }
-
-   warningsEval() {
-      super.warningsEval();
-
-      let DC = this.datacollection;
-      if (!DC) {
-         this.warningsMessage(
-            `can't resolve it's datacollection[${this.settings.dataviewID}]`
-         );
-      } else {
-         if (this.settings.viewType == "connected") {
-            const object = DC.datasource;
-            const [field] = object.fields(
-               (f) => f.columnName === this.settings.field
-            );
-            if (!field) {
-               this.warningsMessage(`can't resolve field reference`);
-            }
-         }
-      }
-   }
-}
-
-
-/***/ },
-
-/***/ 46672
-/*!*************************************************!*\
-  !*** ./AppBuilder/platform/views/ABViewMenu.js ***!
-  \*************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ ABViewMenu)
-/* harmony export */ });
-/* harmony import */ var _core_views_ABViewMenuCore__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../core/views/ABViewMenuCore */ 65419);
-/* harmony import */ var _viewComponent_ABViewMenuComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./viewComponent/ABViewMenuComponent */ 75210);
-
-
-
-class ABViewMenu extends _core_views_ABViewMenuCore__WEBPACK_IMPORTED_MODULE_0__["default"] {
-   /**
-    * @function component()
-    * return a UI component based upon this view.
-    * @return {obj} UI component
-    */
-   component() {
-      return new _viewComponent_ABViewMenuComponent__WEBPACK_IMPORTED_MODULE_1__["default"](this);
    }
 };
 
@@ -53829,82 +52665,6 @@ class ABViewPopupSortFields extends _ui_ClassUI__WEBPACK_IMPORTED_MODULE_0__["de
 
 /***/ },
 
-/***/ 87929
-/*!***********************************************************!*\
-  !*** ./AppBuilder/platform/views/ABViewReportsManager.js ***!
-  \***********************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ ABViewReportsManager)
-/* harmony export */ });
-/* harmony import */ var _core_views_ABViewReportsManagerCore__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../core/views/ABViewReportsManagerCore */ 74238);
-/* harmony import */ var _viewComponent_ABViewReportsManagerComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./viewComponent/ABViewReportsManagerComponent */ 24965);
-
-
-
-class ABViewReportsManager extends _core_views_ABViewReportsManagerCore__WEBPACK_IMPORTED_MODULE_0__["default"] {
-   // constructor(values, application, parent, defaultValues) {
-   //    super(values, application, parent, defaultValues);
-   // }
-
-   //
-   //	Editor Related
-   //
-
-   /**
-    * @method component()
-    * return a UI component based upon this view.
-    * @return {obj} UI component
-    */
-   component() {
-      return new _viewComponent_ABViewReportsManagerComponent__WEBPACK_IMPORTED_MODULE_1__["default"](this);
-   }
-};
-
-
-/***/ },
-
-/***/ 36506
-/*!******************************************************!*\
-  !*** ./AppBuilder/platform/views/ABViewScheduler.js ***!
-  \******************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ ABViewScheduler)
-/* harmony export */ });
-/* harmony import */ var _core_views_ABViewSchedulerCore__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../core/views/ABViewSchedulerCore */ 74441);
-/* harmony import */ var _viewComponent_ABViewSchedulerComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./viewComponent/ABViewSchedulerComponent */ 37514);
-
-
-
-class ABViewScheduler extends _core_views_ABViewSchedulerCore__WEBPACK_IMPORTED_MODULE_0__["default"] {
-   // constructor(values, application, parent, defaultValues) {
-   //    super(values, application, parent, defaultValues);
-   // }
-
-   /**
-    * @method component()
-    * return a UI component based upon this view.
-    * @return {obj} UI component
-    */
-   component() {
-      return new _viewComponent_ABViewSchedulerComponent__WEBPACK_IMPORTED_MODULE_1__["default"](this);
-   }
-
-   warningsEval() {
-      super.warningsEval();
-   }
-};
-
-
-/***/ },
-
 /***/ 87039
 /*!***************************************************!*\
   !*** ./AppBuilder/platform/views/ABViewWidget.js ***!
@@ -53919,9 +52679,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _core_views_ABViewWidgetCore__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../core/views/ABViewWidgetCore */ 65472);
 
 
-const ABPropertyComponentDefaults = _core_views_ABViewWidgetCore__WEBPACK_IMPORTED_MODULE_0__["default"].defaultValues();
+// const ABPropertyComponentDefaults = ABViewWidgetCore.defaultValues();
 
-let L = (...params) => AB.Multilingual.label(...params);
+// let L = (...params) => AB.Multilingual.label(...params);
 
 class ABViewWidget extends _core_views_ABViewWidgetCore__WEBPACK_IMPORTED_MODULE_0__["default"] {
    // constructor(values, application, parent, defaultValues) {
@@ -53937,7 +52697,7 @@ class ABViewWidget extends _core_views_ABViewWidgetCore__WEBPACK_IMPORTED_MODULE
    component(App) {
       let base = super.component(App);
 
-      base.onShow = (viewId) => {
+      base.onShow = (/* viewId */) => {
          let dv = this.datacollection; // get from a function or a (get) property
          if (dv && dv.dataStatus == dv.dataStatusFlag.notInitial) {
             // load data when a widget is showing
@@ -54165,345 +52925,6 @@ class ABViewComponent extends _ui_ClassUI__WEBPACK_IMPORTED_MODULE_0__["default"
 
 /***/ },
 
-/***/ 53382
-/*!****************************************************************************************!*\
-  !*** ./AppBuilder/platform/views/viewComponent/ABViewConditionalContainerComponent.js ***!
-  \****************************************************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ ABViewConditionalContainerComponent)
-/* harmony export */ });
-/* harmony import */ var _ABViewContainerComponent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ABViewContainerComponent */ 71980);
-
-
-class ABViewConditionalContainerComponent extends (
-   _ABViewContainerComponent__WEBPACK_IMPORTED_MODULE_0__["default"]
-) {
-   constructor(baseView, idBase, ids) {
-      super(
-         baseView,
-         idBase || `ABViewConditionalContainer_${baseView.id}`,
-         Object.assign(
-            {
-               batch: "",
-            },
-            ids
-         )
-      );
-
-      this._ifComponent = null;
-      this._elseComponent = null;
-
-      // Set filter value
-      this.__filterComponent = baseView.AB.filterComplexNew(
-         `${baseView.id}_filterComponent`
-      );
-      // this.__filterComponent.applicationLoad(application);
-      this.populateFilterComponent();
-   }
-
-   ui() {
-      const _uiConditionalContainer = {
-         id: this.ids.batch,
-         view: "multiview",
-         cells: [
-            {
-               batch: "wait",
-               view: "layout",
-               rows: [
-                  {
-                     view: "label",
-                     label: this.label("Please wait..."),
-                  },
-               ],
-            },
-         ],
-      };
-      const _ui = super.ui([_uiConditionalContainer]);
-
-      _uiConditionalContainer.cells.push(
-         Object.assign({ batch: "if" }, this.ifComponent.ui()),
-         Object.assign({ batch: "else" }, this.elseComponent.ui())
-      );
-
-      delete _ui.type;
-
-      return _ui;
-   }
-
-   async init(AB, accessLevel) {
-      await super.init(AB, accessLevel);
-
-      await Promise.all([
-         this.ifComponent.init(AB, accessLevel),
-         this.elseComponent.init(AB, accessLevel),
-      ]);
-
-      this.populateFilterComponent();
-
-      const dc = this.datacollection;
-
-      if (dc) {
-         const baseView = this.view;
-
-         // listen DC events
-         baseView.eventAdd({
-            emitter: dc,
-            eventName: "loadData",
-            listener: () => this.displayView(), // Q? does this need to remain empty param?
-         });
-
-         baseView.eventAdd({
-            emitter: dc,
-            eventName: "initializedData",
-            listener: () => this.displayView(), // Q? does this need to remain empty param?
-         });
-
-         ["changeCursor", "cursorStale"].forEach((key) => {
-            baseView.eventAdd({
-               emitter: dc,
-               eventName: key,
-               listener: (...p) => this.displayView(...p),
-            });
-         });
-      }
-
-      this.displayView();
-   }
-
-   onShow() {
-      super.onShow();
-
-      this.populateFilterComponent();
-      this.displayView();
-   }
-
-   get ifComponent() {
-      return (this._ifComponent =
-         this._ifComponent ||
-         this.view
-            .views()
-            .find((v) => v?.name === "If")
-            .component());
-   }
-
-   get elseComponent() {
-      return (this._elseComponent =
-         this._elseComponent ||
-         this.view
-            .views()
-            .find((v) => v?.name === "Else")
-            .component());
-   }
-
-   displayView(currData) {
-      const dc = this.datacollection;
-      const ids = this.ids;
-      const $batch = $$(ids.batch);
-
-      if (dc) {
-         if (!currData) currData = dc.getCursor();
-
-         // show 'waiting' panel
-         if (
-            !currData &&
-            (dc.dataStatus === dc.dataStatusFlag.notInitial ||
-               dc.dataStatus === dc.dataStatusFlag.initializing)
-         ) {
-            $batch?.showBatch("wait");
-
-            return;
-         }
-      }
-
-      const isValid = this.__filterComponent.isValid(currData);
-
-      if (isValid) {
-         // if (isValid && currData) {
-         $batch?.showBatch("if");
-         this.ifComponent?.onShow?.();
-      } else {
-         $batch?.showBatch("else");
-         this.elseComponent?.onShow?.();
-      }
-   }
-
-   populateFilterComponent() {
-      const dc = this.datacollection;
-      const __filterComponent = this.__filterComponent;
-
-      if (dc?.datasource) __filterComponent.fieldsLoad(dc.datasource.fields());
-      else __filterComponent.fieldsLoad([]);
-
-      __filterComponent.setValue(
-         this.settings.filterConditions ??
-            this.view.constructor.defaultValues().filterConditions
-      );
-   }
-};
-
-
-/***/ },
-
-/***/ 77577
-/*!*************************************************************************************!*\
-  !*** ./AppBuilder/platform/views/viewComponent/ABViewConnectDataFilterComponent.js ***!
-  \*************************************************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ ABViewConnectDataFilterComponent)
-/* harmony export */ });
-/* harmony import */ var _ABViewComponent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ABViewComponent */ 23687);
-
-
-class ABViewConnectDataFilterComponent extends _ABViewComponent__WEBPACK_IMPORTED_MODULE_0__["default"] {
-   constructor(baseView, idbase, ids) {
-      super(
-         baseView,
-         idbase || `ABViewConnectDataFilter_${baseView.id}`,
-         Object.assign(
-            {
-               filter: "",
-               reset: "",
-            },
-            ids
-         )
-      );
-
-      this.field = null;
-   }
-
-   ui() {
-      const ids = this.ids;
-      const _ui = super.ui([
-         {
-            type: "space",
-            borderless: true,
-            cols: [
-               {
-                  view: "icon",
-                  icon: "fa fa-filter",
-                  align: "left",
-                  disabled: true,
-               },
-               {
-                  view: "combo",
-                  id: ids.filter,
-                  labelWidth: this.AB.UISettings.config().labelWidthXLarge,
-                  disabled: true,
-                  on: {
-                     onChange: (id) => this.applyConnectFilter(id),
-                  },
-               },
-               {
-                  view: "icon",
-                  id: ids.reset,
-                  icon: "fa fa-times",
-                  align: "left",
-                  disabled: true,
-                  tooltip: this.label("Renmove this filter"),
-                  on: {
-                     onItemClick: () => this.resetConnectFilter(),
-                  },
-               },
-            ],
-         },
-      ]);
-
-      delete _ui.type;
-
-      return _ui;
-   }
-
-   async init(AB) {
-      await super.init(AB);
-
-      const dv = this.datacollection;
-
-      if (!dv) return;
-
-      const object = dv.datasource;
-
-      if (!object) return;
-
-      const [field] = object.fields(
-         (f) => f.columnName === this.settings.field
-      );
-
-      if (!field) {
-         this.AB.notify.developer(
-            `Cannot find field "${this.settings.field}" in ${object.name}`,
-            {
-               context: "ABViewConnectDataFilterComponent.init()",
-               data: { settings: this.settings },
-            }
-         );
-
-         return;
-      }
-
-      this.field = field;
-
-      const ids = this.ids;
-      const suggest = webix.ui({
-         view: "suggest",
-         filter: ({ value }, search) =>
-            value.toLowerCase().includes(search.toLowerCase()),
-         on: {
-            onShow: () => {
-               field.populateOptionsDataCy($$(ids.filter), field, {});
-            },
-         },
-      });
-      field.getAndPopulateOptions(suggest, null, field);
-
-      const $filter = $$(ids.filter);
-
-      $filter.define("suggest", suggest);
-      $filter.define("label", `${this.label("Filter by")} ${field.label}`);
-      $filter.enable();
-      $filter.refresh();
-   }
-
-   resetConnectFilter() {
-      const ids = this.ids;
-      const dc = this.datacollection;
-
-      dc.filterCondition({ glue: "and", rules: [] });
-      dc.reloadData();
-      // Block applyConnectFields() from triggering
-
-      const $filter = $$(ids.filter);
-
-      $filter.blockEvent();
-      $filter.setValue();
-      $filter.unblockEvent();
-      $$(ids.reset).disable();
-   }
-
-   applyConnectFilter(connectId) {
-      const filterRule = {
-         key: this.field.id,
-         rule: "equals",
-         value: connectId,
-      };
-      const dc = this.datacollection;
-
-      dc.filterCondition({ glue: "and", rules: [filterRule] });
-      dc.reloadData();
-      $$(this.ids.reset).enable();
-   }
-}
-
-
-/***/ },
-
 /***/ 71980
 /*!*****************************************************************************!*\
   !*** ./AppBuilder/platform/views/viewComponent/ABViewContainerComponent.js ***!
@@ -54577,7 +52998,7 @@ class ABViewContainerComponent extends _ABViewComponent__WEBPACK_IMPORTED_MODULE
       for (const key in viewComponents) {
          // skip when the view is removed.
          if (
-            !viewComponents[key] ??
+            !(viewComponents[key] ?? false) ||
             !this.view.views((v) => v.id === key).length
          )
             continue;
@@ -54600,7 +53021,6 @@ class ABViewContainerComponent extends _ABViewComponent__WEBPACK_IMPORTED_MODULE
       const componentMap = {};
 
       let curRowIndex;
-      let curColIndex;
 
       const settings = this.settings;
       const defaultSettings = this.view.constructor.defaultValues();
@@ -54638,7 +53058,6 @@ class ABViewContainerComponent extends _ABViewComponent__WEBPACK_IMPORTED_MODULE
          // Create a new row
          if (v.position.y == null || v.position.y !== curRowIndex) {
             curRowIndex = v.position.y || rows.length;
-            curColIndex = 0;
 
             const rowNew = {
                cols: [],
@@ -54667,7 +53086,7 @@ class ABViewContainerComponent extends _ABViewComponent__WEBPACK_IMPORTED_MODULE
 
          if (componentMap[mapKey])
             console.error(
-               `Component[${component?.ids?.component}] is overwriting component[${componentMap[mapKey].ids?.component}]. <-- Reorder them to fix.`
+               `Component[${component?.ids?.component}] is overwriting component[${componentMap[mapKey].ids?.component}]. <-- Reorder them to fix.`,
             );
 
          componentMap[mapKey] = component;
@@ -54689,8 +53108,6 @@ class ABViewContainerComponent extends _ABViewComponent__WEBPACK_IMPORTED_MODULE
             eventName: "changePage",
             listener: this._handlerChangePage,
          });
-
-         curColIndex++;
       });
 
       return rows;
@@ -54704,2094 +53121,7 @@ class ABViewContainerComponent extends _ABViewComponent__WEBPACK_IMPORTED_MODULE
          val.onShow?.();
       });
    }
-};
-
-
-/***/ },
-
-/***/ 56397
-/*!******************************************************************************!*\
-  !*** ./AppBuilder/platform/views/viewComponent/ABViewDataFilterComponent.js ***!
-  \******************************************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ ABViewDataFilterComponent)
-/* harmony export */ });
-/* harmony import */ var _ABViewComponent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ABViewComponent */ 23687);
-/* harmony import */ var _ABViewPopupSortFields__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../ABViewPopupSortFields */ 49000);
-/* harmony import */ var _viewProperties_ABViewPropertyFilterData__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../viewProperties/ABViewPropertyFilterData */ 95889);
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! lodash */ 84529);
-/* harmony import */ var lodash__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(lodash__WEBPACK_IMPORTED_MODULE_3__);
-
-
-
-
-
-class ABViewDataFilterComponent extends _ABViewComponent__WEBPACK_IMPORTED_MODULE_0__["default"] {
-   constructor(baseView, idbase, ids) {
-      super(
-         baseView,
-         idbase || `ABViewDataFilter_${baseView.id}`,
-         Object.assign(
-            {
-               filter: "",
-               reset: "",
-               sortButton: "",
-               filterButton: "",
-               globalSearchToolbar: "",
-            },
-            ids
-         )
-      );
-
-      this._handler_filterData = (fnFilter, filterRules) => {
-         this.callbackFilterData(fnFilter, filterRules); // be notified when there is a change in the filter
-      };
-
-      this.field = null;
-      const ab = this.AB;
-
-      // {ABViewGridPopupSortFields}
-      // The popup for adding sort criteria to our grid.
-      this.PopupSortComponent = new _ABViewPopupSortFields__WEBPACK_IMPORTED_MODULE_1__["default"](
-         `ABViewDataFilter_Sort_Popup_${this.settings.dataviewID}`
-      );
-      this.PopupSortComponent.init(ab);
-      this.PopupSortComponent.on("changed", (sortOptions) => {
-         this.callbackSortData(sortOptions);
-      });
-
-      this.filterHelper = new _viewProperties_ABViewPropertyFilterData__WEBPACK_IMPORTED_MODULE_2__["default"](
-         this.AB,
-         `ABViewDataFilter_Filter_Popup_${this.settings.dataviewID}`
-      );
-      this.filterHelper.settings = {
-         filterOption: 1,
-         userFilterPosition: "toolbar",
-         isGlobalToolbar: 1,
-      };
-      this.filterHelper.init(ab);
-      this.detatch();
-      this.filterHelper.on("filter.data", this._handler_filterData);
-   }
-
-   advancedUI() {
-      const compId = this.ids.component;
-      return [
-         {
-            css: "bg_gray",
-            maxHeight: 60,
-            rows: [
-               {},
-               {
-                  cols: [
-                     {
-                        width: 18,
-                     },
-                     {
-                        view: "button",
-                        type: "icon",
-                        icon: "fa fa-filter",
-                        width: 40,
-                        id: this.ids.filterButton,
-                        css: `webix_primary abFilterButton${this.settings.dataviewID}`,
-                        click: (id, event) => {
-                           this.toolbarFilter($$(this.ids.filterButton).$view);
-                        },
-                        on: {
-                           onAfterRender: function () {
-                              this.getInputNode().setAttribute(
-                                 "data-cy",
-                                 `${compId} filter button`
-                              );
-                           },
-                        },
-                     },
-                     {
-                        view: "button",
-                        type: "icon",
-                        icon: "fa fa-sort",
-                        width: 40,
-                        id: this.ids.sortButton,
-                        css: `webix_primary abSortButton${this.settings.dataviewID}`,
-                        click: (id, event) => {
-                           this.openSort($$(this.ids.sortButton).$view);
-                        },
-                        on: {
-                           onAfterRender: function () {
-                              this.getInputNode().setAttribute(
-                                 "data-cy",
-                                 `${compId} sort button`
-                              );
-                           },
-                        },
-                     },
-                     {
-                        id: this.ids.globalSearchToolbar,
-                        view: "search",
-                        placeholder: this.label("Search.."),
-                        css: `abGlobalSearchField${this.settings.dataviewID}`,
-                        width: 0,
-                        attributes: {
-                           "data-cy": `${this.ids.component} global search`,
-                           datacollection: this.settings.dataviewID,
-                        },
-                        on: {
-                           onTimedKeyPress: () => {
-                              const searchText = $$(
-                                 this.ids.globalSearchToolbar
-                              ).getValue();
-                              // store search text in datacollection because
-                              // it is shared amoung the similar filterHelpers
-                              const dc = this.datacollection;
-                              dc.settings.objectWorkspace.searchText =
-                                 searchText;
-
-                              this.filterHelper.externalSearchText(searchText);
-                           },
-                        },
-                     },
-                     {
-                        width: 18,
-                     },
-                  ],
-               },
-               {},
-            ],
-         },
-      ];
-   }
-
-   connectedFieldUI() {
-      return [
-         {
-            css: "bg_gray",
-            maxHeight: 60,
-            cols: [
-               {
-                  width: 18,
-               },
-               {
-                  rows: [
-                     {},
-                     {
-                        view: "abslayout",
-                        cells: [
-                           {
-                              css: "bg_gray",
-                              view: "combo",
-                              id: this.ids.filter,
-                              labelWidth: 0,
-                              relative: true,
-                              disabled: true,
-                              on: {
-                                 onChange: (id) => {
-                                    this.applyConnectFilter(
-                                       $$(this.ids.filter).getList().getItem(id)
-                                    );
-                                 },
-                              },
-                           },
-                           {
-                              view: "icon",
-                              id: this.ids.reset,
-                              icon: "fa fa-times",
-                              right: 24,
-                              top: 7,
-                              width: 24,
-                              height: 24,
-                              hidden: true,
-                              tooltip: this.label("Remove this filter"),
-                              on: {
-                                 onItemClick: () =>
-                                    $$(this.ids.filter).setValue(),
-                              },
-                           },
-                        ],
-                     },
-                     {},
-                  ],
-               },
-               {
-                  width: 18,
-               },
-            ],
-         },
-      ];
-   }
-
-   ui() {
-      if (
-         !this.settings?.dataviewID ||
-         (this.settings?.viewType !== "advanced" && !this.settings?.field)
-      )
-         return { height: 1, id: this.ids.component };
-
-      const ui =
-         this.settings.viewType == "advanced"
-            ? this.advancedUI()
-            : this.connectedFieldUI();
-      const _ui = super.ui(ui);
-
-      delete _ui.type;
-
-      return _ui;
-   }
-
-   async init(AB) {
-      await super.init(AB);
-
-      const dv = this.datacollection;
-
-      if (!dv) return;
-
-      const object = dv.datasource;
-
-      if (!object) return;
-
-      if (this.settings.viewType == "advanced") {
-         if (this.settings.showSort) {
-            this.PopupSortComponent.objectLoad(object);
-            // if there are some preset sorts show them to user
-            this.PopupSortComponent.setSettings(
-               dv?.settings?.objectWorkspace?.sortFields
-            );
-         } else {
-            $$(this.ids.sortButton).hide();
-         }
-         if (this.settings.showFilter) {
-            this.filterHelper.objectLoad(object);
-         } else {
-            $$(this.ids.filterButton).hide();
-         }
-      } else if (this.settings.viewType == "connected") {
-         const [field] = object.fields(
-            (f) => f.columnName === this.settings.field
-         );
-
-         if (!field) {
-            this.AB.notify.developer(
-               `Cannot find field "${this.settings.field}" in ${object.name}`,
-               {
-                  context: "ABViewDataFilterComponent.init()",
-                  data: { settings: this.settings },
-               }
-            );
-
-            return;
-         }
-
-         this.field = field;
-
-         const ids = this.ids;
-         const suggest = webix.ui({
-            view: "suggest",
-            filter: ({ value }, search) =>
-               value.toLowerCase().includes(search.toLowerCase()),
-            on: {
-               onShow: () => {
-                  field.populateOptionsDataCy($$(ids.filter), field, {});
-               },
-            },
-            showAllOptions: true,
-         });
-         field.getAndPopulateOptions(suggest, null, field);
-
-         const $filter = $$(ids.filter);
-
-         $filter.define("suggest", suggest);
-         $filter.define(
-            "placeholder",
-            `${this.label("Filter by")} ${field.label}`
-         );
-         $filter.enable();
-         $filter.refresh();
-      }
-   }
-
-   onShow() {
-      super.onShow();
-      this.updateUI();
-   }
-
-   applyConnectFilter(rowData) {
-      let connectedVal = rowData?.id ?? null;
-
-      if (
-         connectedVal &&
-         this.field.settings?.isCustomFK &&
-         this.field.settings?.isSource
-      ) {
-         connectedVal =
-            (this.field.indexField
-               ? rowData[this.field.indexField.columnName]
-               : null) ?? // custom index
-            (this.field.indexField2
-               ? rowData[this.field.indexField2.columnName]
-               : null) ?? // custom index 2
-            rowData.id ??
-            rowData;
-      }
-
-      let filterRule = [];
-      if (connectedVal) {
-         $$(this.ids.reset).show();
-         filterRule = [
-            {
-               key: this.field.id,
-               rule: "equals",
-               value: connectedVal,
-            },
-         ];
-      } else {
-         $$(this.ids.reset).hide();
-      }
-      const dc = this.datacollection;
-
-      dc.filterCondition({ glue: "and", rules: filterRule });
-      dc.reloadData();
-   }
-
-   openSort($view) {
-      this.PopupSortComponent.show($view);
-   }
-
-   /**
-    * @method callbackSortData()
-    * Process the provided sort options from our sort ui.
-    * @param {array} sortRules
-    *        Any Sort Rules added by the user.
-    */
-   async callbackSortData(sortRules = []) {
-      const dc = this.datacollection;
-      if (!lodash__WEBPACK_IMPORTED_MODULE_3___default().isEqual(dc?.settings?.objectWorkspace?.sortFields, sortRules)) {
-         dc.settings.objectWorkspace.sortFields = sortRules;
-         await this.datacollection.reloadData();
-      }
-      this.updateUI();
-   }
-
-   /**
-    * @method callbackFilterData()
-    * Process the provided filter options from our filterHelper.
-    * @param {fn} fnFilter
-    *        A function that returns true/false for each row of data
-    *        to determine if is should exist.
-    * @param {array} filterRules
-    *        Any Filter Rules added by the user.
-    */
-   callbackFilterData(fnFilter, filterRules = []) {
-      const dc = this.datacollection;
-      if (!lodash__WEBPACK_IMPORTED_MODULE_3___default().isEqual(dc?.__filterCond, filterRules)) {
-         dc.filterCondition(filterRules);
-         dc.reloadData();
-         this.updateUI();
-      }
-   }
-
-   toolbarFilter($view) {
-      this.filterHelper.showPopup($view);
-   }
-
-   updateUI() {
-      const dc = this.datacollection;
-
-      if (!dc) return;
-
-      var filterButtons = document.getElementsByClassName(
-         `abFilterButton${this.settings.dataviewID}`
-      );
-
-      const onlyFilterRules = this.filterHelper.filterRules();
-      let filterBadge =
-         onlyFilterRules?.rules?.length > 0
-            ? onlyFilterRules?.rules?.length
-            : null;
-      for (let b of filterButtons) {
-         $$(b).define("badge", filterBadge);
-         $$(b).refresh();
-      }
-
-      var sortButtons = document.getElementsByClassName(
-         `abSortButton${this.settings.dataviewID}`
-      );
-
-      const onlySortRules = dc.settings.objectWorkspace.sortFields;
-      let sortBadge = onlySortRules?.length > 0 ? onlySortRules?.length : null;
-
-      for (let b of sortButtons) {
-         $$(b).define("badge", sortBadge);
-         $$(b).refresh();
-      }
-
-      var searchFields = document.getElementsByClassName(
-         `abGlobalSearchField${this.settings.dataviewID}`
-      );
-
-      const searchText = dc.settings.objectWorkspace.searchText;
-      if (searchText != null) {
-         for (let s of searchFields) {
-            var activeElement = document.activeElement;
-            if (
-               activeElement?.attributes?.datacollection?.value ==
-                  this.settings.dataviewID &&
-               activeElement == s.getElementsByTagName("input")[0]
-            ) {
-               // skip the already selected input
-            } else {
-               $$(s).setValue(searchText);
-            }
-         }
-      }
-   }
-
-   detatch() {
-      this.filterHelper.removeListener("filter.data", this._handler_filterData);
-      // this.datacollection?.removeListener("changeCursor", this.handler_select);
-   }
 }
-
-
-/***/ },
-
-/***/ 75210
-/*!************************************************************************!*\
-  !*** ./AppBuilder/platform/views/viewComponent/ABViewMenuComponent.js ***!
-  \************************************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ ABViewMenuComponent)
-/* harmony export */ });
-/* harmony import */ var _ABViewComponent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ABViewComponent */ 23687);
-
-
-class ABViewMenuComponent extends _ABViewComponent__WEBPACK_IMPORTED_MODULE_0__["default"] {
-   constructor(baseView, idBase, ids) {
-      super(
-         baseView,
-         idBase || `ABViewMenu_${baseView.id}`,
-         Object.assign(
-            {
-               menu: "",
-            },
-            ids
-         )
-      );
-   }
-
-   ui() {
-      const settings = this.settings;
-      const _ui = super.ui([
-         parseInt(settings.menuInToolbar) ? this.uiToolbar() : this.uiMenu(),
-      ]);
-
-      delete _ui.type;
-
-      return _ui;
-   }
-
-   uiMenu() {
-      const baseView = this.view;
-      const settings = this.settings;
-      const defaultSettings = baseView.constructor.defaultValues();
-      const css = `${settings.buttonStyle || defaultSettings.buttonStyle} ${
-         settings.menuAlignment || defaultSettings.menuAlignment
-      } `;
-
-      return {
-         id: this.ids.menu,
-         view: "menu",
-         autoheight: true,
-         autowidth: true,
-         datatype: "json",
-         css: css,
-         layout: settings.orientation || defaultSettings.orientation,
-         on: {
-            onMenuItemClick: (id /*, e, node */) => {
-               this.onClick(id);
-            },
-            onAfterRender: () => {
-               this.defineCypress();
-            },
-         },
-         type: {
-            subsign: true,
-         },
-      };
-   }
-
-   uiToolbar() {
-      const settings = this.settings;
-      const baseView = this.view;
-      const defaultSettings = baseView.constructor.defaultValues();
-      const _uiMenu = this.uiMenu();
-
-      let elems = [];
-      let menuIncluded = false;
-
-      // Legacy support: use old settings values if translated values are not set
-      const menuTextLeft = baseView.menuTextLeft ?? settings.menuTextLeft;
-      const menuTextCenter = baseView.menuTextCenter ?? settings.menuTextCenter;
-      const menuTextRight = baseView.menuTextRight ?? settings.menuTextRight;
-
-      if (settings.menuPosition === "left") {
-         menuIncluded = true;
-         elems.push(_uiMenu);
-      } else if (menuTextLeft?.length) {
-         const width = menuTextLeft.length * 15;
-
-         elems.push({
-            view: "label",
-            label: menuTextLeft,
-            align: "left",
-            width: width,
-         });
-      } else
-         elems.push({
-            view: "label",
-            label: "",
-            autowidth: true,
-         });
-
-      if (settings?.menuPosition === "center") {
-         menuIncluded = true;
-
-         elems.push(_uiMenu);
-      } else if (menuTextCenter?.length) {
-         const width = menuTextLeft.length * 15;
-
-         elems.push(
-            {},
-            {
-               view: "label",
-               label: menuTextCenter,
-               align: "center",
-               width: width,
-            },
-            {}
-         );
-      } else
-         elems.push({
-            view: "label",
-            label: "",
-            autowidth: true,
-         });
-
-      if (settings?.menuPosition === "right") {
-         menuIncluded = true;
-
-         elems.push(_uiMenu);
-      } else if (menuTextRight?.length) {
-         const width = menuTextLeft.length * 15;
-
-         elems.push({
-            view: "label",
-            label: menuTextRight,
-            align: "right",
-            width: width,
-         });
-      } else
-         elems.push({
-            view: "label",
-            label: "",
-            autowidth: true,
-         });
-
-      if (menuIncluded === false) elems = [_uiMenu];
-
-      return {
-         view: "toolbar",
-         css: settings.menuTheme ?? defaultSettings.menuTheme,
-         padding: settings.menuPadding
-            ? parseInt(settings.menuPadding)
-            : defaultSettings.menuPadding,
-         elements: elems,
-      };
-   }
-
-   async init(AB) {
-      await super.init(AB);
-
-      const $menu = $$(this.ids.menu);
-      const baseView = this.view;
-
-      if ($menu) {
-         const settings = this.settings;
-
-         baseView.ClearPagesInView($menu);
-
-         if (settings.order?.length) {
-            baseView.AddPagesToView($menu, settings.order);
-            // Force onAfterRender to fire
-            $menu.refresh();
-         }
-      }
-   }
-
-   onClick(itemId) {
-      const $menu = $$(this.ids.menu);
-      let $item;
-      try {
-         $item = $menu.getMenuItem(itemId);
-      } catch (err) {
-         this.AB.notify.developer(err, {
-            context:
-               "ABViewMenuComponent > onClick error gettint menu / menu item",
-            itemId,
-            menu: {
-               id: this.view.id,
-               settings: this.view.settings,
-            },
-         });
-         return;
-      }
-      const baseView = this.view;
-
-      // switch tab view
-      if ($item.type === "tab") {
-         baseView.changePage($item.pageId);
-
-         const redirectPage = baseView.application.pages(
-            (p) => p.id === $item.pageId,
-            true
-         )[0];
-
-         if (!redirectPage) return;
-
-         const tabView = redirectPage.views((v) => v.id === $item.id, true)[0];
-
-         if (!tabView) return;
-
-         const tab = tabView.parent;
-
-         if (!tab) return;
-
-         this.toggleParent(tab);
-
-         // if (!$$(tabView.id) || !$$(tabView.id).isVisible()) {
-         const showIt = setInterval(() => {
-            if ($$(tabView.id) && $$(tabView.id).isVisible()) {
-               clearInterval(showIt);
-
-               return;
-            }
-
-            tab.emit("changeTab", tabView.id);
-         }, 100);
-         // }
-      }
-      // switch page
-      else baseView.changePage(itemId);
-   }
-
-   toggleParent(element) {
-      if (!element.parent) return false;
-
-      const parentElem = element.parent;
-
-      if (!parentElem?.parent) return false;
-
-      parentElem.parent.emit("changeTab", parentElem.id);
-      this.toggleParent(parentElem.parent);
-   }
-
-   defineCypress() {
-      const $menu = $$(this.ids.menu);
-
-      if (!$menu) return;
-
-      $menu.data.each((item) => {
-         const node = $menu.getItemNode(item.id);
-
-         if (!node) return;
-
-         // get linked page/tab info so we can use its name in the data-cy
-         const viewInfo = this.AB.definitionByID(item.id);
-
-         node.setAttribute(
-            "data-cy",
-            `menu-item ${viewInfo?.name} ${item.id} ${this.view.id}`
-         );
-      });
-   }
-};
-
-
-/***/ },
-
-/***/ 24965
-/*!**********************************************************************************!*\
-  !*** ./AppBuilder/platform/views/viewComponent/ABViewReportsManagerComponent.js ***!
-  \**********************************************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ ABViewReportsManagerComponent)
-/* harmony export */ });
-/* harmony import */ var _ABViewComponent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ABViewComponent */ 23687);
-
-
-class ABViewReportsManagerComponent extends _ABViewComponent__WEBPACK_IMPORTED_MODULE_0__["default"] {
-   constructor(baseView, idBase, ids) {
-      super(
-         baseView,
-         idBase || `ABViewReportManager_${baseView.id}`,
-         Object.assign(
-            {
-               reportManager: "",
-            },
-            ids
-         )
-      );
-
-      this.readonly = false;
-   }
-
-   ui() {
-      const self = this;
-      const settings = this.settings;
-      const ab = this.AB;
-      const abWebix = ab.Webix;
-      const dc = this.datacollection;
-      const fieldName = dc?.datasource.fieldByID(
-         settings.dataviewFields.name
-      )?.columnName;
-      const fieldText = dc?.datasource.fieldByID(
-         settings.dataviewFields.text
-      )?.columnName;
-      const fieldQueries = dc?.datasource.fieldByID(
-         settings.dataviewFields.queries
-      )?.columnName;
-      const ids = this.ids;
-      class MyBackend extends reports.services.Backend {
-         async getModules() {
-            if (dc == null) return [];
-
-            await self.waitInitializingDCEvery(1000, dc);
-
-            return dc.getData().map((e) => {
-               return {
-                  id: e.id,
-                  name: e[fieldName],
-                  text: JSON.stringify(e[fieldText]),
-                  updated: e["updated_at"],
-               };
-            });
-         }
-
-         async addModule(data) {
-            const parsedData = {};
-
-            parsedData[fieldName] = data.name;
-            parsedData[fieldText] = data.text;
-
-            const response = await dc.model.create(parsedData);
-
-            return {
-               id: response.id,
-            };
-         }
-
-         async updateModule(id, data) {
-            const parsedData = {};
-
-            parsedData[fieldName] = data.name;
-            parsedData[fieldText] = data.text;
-
-            let response = {};
-
-            response = await dc.model.update(id, parsedData);
-
-            return { id: response.id };
-         }
-
-         async deleteModule(id) {
-            await dc.model.delete(id);
-
-            return { id: id };
-         }
-
-         async getModels() {
-            const reportModels = {};
-
-            // If no selected DC then get all DCs
-            (settings.datacollectionIDs.length > 0
-               ? settings.datacollectionIDs
-               : self.view.application.datacollectionIDs
-            ).forEach((dcID) => {
-               const dc = ab.datacollectionByID(dcID);
-
-               if (!dc) return;
-
-               const obj = dc.datasource;
-
-               if (!obj) return;
-
-               const reportFields = self.getReportFields(dc);
-
-               // get connected data collections
-               // let linkedFields = [];
-               // (obj.connectFields() || []).forEach((f, index) => {
-               //    let connectedDcs = ab.datacollections(
-               //       (dColl) =>
-               //          dColl &&
-               //          dColl.datasource &&
-               //          dColl.datasource.id === f.settings.linkObject
-               //    );
-               //    (connectedDcs || []).forEach((linkedDc) => {
-               //       linkedFields.push({
-               //          id: index + 1,
-               //          name: linkedDc.label,
-               //          source: dc.id,
-               //          target: linkedDc.id
-               //       });
-               //    });
-               // });
-
-               // // MOCK UP for testing
-               // let linkedFields = [
-               //    {
-               //       id: "id",
-               //       name: "id",
-               //       source: "39378ee0-38f0-4b9d-a5aa-dddc61137fcd", // Player
-               //       target: "0de82362-4ab5-4f0f-8cfa-d1288d173cba" // Team
-               //    }
-               // ];
-
-               reportModels[dc.id] = {
-                  id: dc.id,
-                  name: dc.label,
-                  data: reportFields,
-                  refs: [],
-               };
-            });
-
-            return reportModels;
-         }
-
-         async getQueries() {
-            const moduleID = $$(ids.reportManager).getState().moduleId || "";
-
-            if (moduleID === "") return [];
-
-            return (
-               (
-                  await dc.model.findAll({
-                     where: {
-                        uuid: moduleID,
-                     },
-                  })
-               ).data[0][fieldQueries] || []
-            );
-         }
-
-         async addQuery(data) {
-            const moduleID = $$(ids.reportManager).getState().moduleId || "";
-
-            if (moduleID === "") return {};
-
-            const moduleData = (
-               await dc.model.findAll({
-                  where: {
-                     uuid: moduleID,
-                  },
-               })
-            ).data[0];
-
-            if (moduleData == null) return {};
-
-            const queries = [...(moduleData[fieldQueries] || [])];
-            const queryID = abWebix.uid();
-
-            queries.push(Object.assign({ id: queryID }, data));
-
-            const parsedData = {};
-
-            parsedData[fieldQueries] = queries.sort((a, b) => {
-               if (a.name < b.name) return -1;
-
-               if (a.name > b.name) return 1;
-
-               return 0;
-            });
-
-            await dc.model.update(moduleID, parsedData);
-
-            return { id: queryID };
-         }
-
-         async updateQuery(id, data) {
-            const moduleID = $$(ids.reportManager).getState().moduleId || "";
-
-            if (moduleID === "") return {};
-
-            const moduleData = (
-               await dc.model.findAll({
-                  where: {
-                     uuid: moduleID,
-                  },
-               })
-            ).data[0];
-
-            if (moduleData == null) return {};
-
-            const queries = [...(moduleData[fieldQueries] || [])];
-            const queryIndex = queries.findIndex((e) => e.id === id);
-
-            queries[queryIndex] = Object.assign({ id }, data);
-
-            const parsedData = {};
-
-            parsedData[fieldQueries] = queries.sort((a, b) => {
-               if (a.name < b.name) return -1;
-
-               if (a.name > b.name) return 1;
-
-               return 0;
-            });
-
-            await dc.model.update(moduleID, parsedData);
-
-            return { id };
-         }
-
-         async deleteQuery(id) {
-            const moduleID = $$(ids.reportManager).getState().moduleId || "";
-
-            if (moduleID === "") return {};
-
-            const moduleData = (
-               await dc.model.findAll({
-                  where: {
-                     uuid: moduleID,
-                  },
-               })
-            ).data[0];
-
-            if (moduleData == null) return {};
-
-            const queries = moduleData[fieldQueries] || [];
-            const queryIndex = queries.findIndex((e) => e.id === id);
-
-            if (queryIndex >= 0) {
-               const parsedData = {};
-
-               parsedData[fieldQueries] = queries
-                  .filter((e, i) => i !== queryIndex)
-                  .sort((a, b) => {
-                     if (a.name < b.name) return -1;
-
-                     if (a.name > b.name) return 1;
-
-                     return 0;
-                  });
-
-               await dc.model.update(moduleID, parsedData);
-            }
-
-            return { id: id };
-         }
-
-         async getData(config) {
-            let result = [];
-            let pullDataTasks = [];
-            let dcIds = [];
-            let dcData = {};
-            let reportFields = [];
-
-            // pull data of the base and join DCs
-            dcIds.push(config.data);
-            (config.joins || []).forEach((j) => {
-               dcIds.push(j.sid);
-               dcIds.push(j.tid);
-            });
-            dcIds = ab.uniq(dcIds);
-            dcIds.forEach((dcId) => {
-               pullDataTasks.push(
-                  new Promise((resolve, reject) => {
-                     const getData = async () => {
-                        try {
-                           dcData[dcId] = (await self.getData(dcId)) || [];
-
-                           resolve();
-                        } catch (err) {
-                           reject(err);
-                        }
-                     };
-
-                     getData();
-                  })
-               );
-            });
-
-            dcIds.forEach((dcId) => {
-               const dataCol = ab.datacollectionByID(dcId);
-
-               if (!dataCol) return;
-
-               reportFields = reportFields.concat(
-                  self.getReportFields(dataCol).map((f) => {
-                     // change format of id to match the report widget
-                     f.id = `${dcId}.${f.id}`; // dc_id.field_id
-                     return f;
-                  })
-               );
-            });
-
-            await Promise.all(pullDataTasks);
-
-            // the data result equals data of the base DC
-            result = dcData[config.data] || [];
-
-            if (config.joins?.length)
-               (config.joins || []).forEach((j) => {
-                  const sourceDc = ab.datacollectionByID(j.sid);
-                  if (!sourceDc) return;
-
-                  const sourceObj = sourceDc.datasource;
-                  if (!sourceObj) return;
-
-                  const targetDc = ab.datacollectionByID(j.tid);
-                  if (!targetDc) return;
-
-                  const targetObj = targetDc.datasource;
-                  if (!targetObj) return;
-
-                  const sourceLinkField = sourceObj.fieldByID(j.sf);
-                  const targetLinkField = targetObj.fieldByID(j.tf);
-                  if (!sourceLinkField && !targetLinkField) return;
-
-                  const sourceData = dcData[j.sid] || [];
-                  const targetData = dcData[j.tid] || [];
-
-                  sourceData.forEach((sData) => {
-                     targetData.forEach((tData) => {
-                        let sVal =
-                           sData[
-                              sourceLinkField
-                                 ? `${j.sid}.${sourceLinkField.columnName}.id`
-                                 : `${j.sid}.id`
-                           ] || [];
-
-                        let tVal =
-                           tData[
-                              targetLinkField
-                                 ? `${j.tid}.${targetLinkField.columnName}.id`
-                                 : `${j.tid}.id`
-                           ] || [];
-
-                        if (!Array.isArray(sVal)) sVal = [sVal];
-
-                        if (!Array.isArray(tVal)) tVal = [tVal];
-
-                        // Add joined row to the result array
-                        const matchedVal = sVal.filter(
-                           (val) => tVal.indexOf(val) > -1
-                        );
-
-                        if (matchedVal?.length) {
-                           const updateRows =
-                              result.filter(
-                                 (r) =>
-                                    r[`${j.sid}.id`] === sData[`${j.sid}.id`] &&
-                                    !r[`${j.tid}.id`]
-                              ) || [];
-
-                           if (updateRows?.length)
-                              (updateRows || []).forEach((r) => {
-                                 for (const key in tData)
-                                    if (key !== "id") r[key] = tData[key];
-                              });
-                           else
-                              result.push(
-                                 Object.assign(
-                                    ab.cloneDeep(sData),
-                                    ab.cloneDeep(tData)
-                                 )
-                              );
-                        }
-                     });
-                  });
-               });
-
-            // filter & sort
-            const queryVal = JSON.parse(config.query || "{}");
-
-            if (queryVal?.rules?.length)
-               queryVal.rules.forEach((r) => {
-                  if (!r || !r.type || !r.condition) return;
-
-                  switch (r.type) {
-                     case "date":
-                        // Convert string to Date object
-                        if (r.condition.filter) {
-                           if (typeof r.condition.filter === "string")
-                              r.condition.filter = ab.rules.toDate(
-                                 r.condition.filter
-                              );
-
-                           if (
-                              r.condition.filter.start &&
-                              typeof r.condition.filter.start === "string"
-                           )
-                              r.condition.filter.start = ab.rules.toDate(
-                                 r.condition.filter.start
-                              );
-
-                           if (
-                              r.condition.filter.end &&
-                              typeof r.condition.filter.end === "string"
-                           )
-                              r.condition.filter.end = ab.rules.toDate(
-                                 r.condition.filter.end
-                              );
-                        }
-
-                        break;
-                  }
-               });
-
-            // create a new query widget to get the filter function
-            const filterElem = abWebix.ui({
-               view: "query",
-               fields: reportFields,
-               value: queryVal,
-            });
-
-            // create a new data collection and apply the query filter
-            const tempDc = new abWebix.DataCollection();
-
-            tempDc.parse(result);
-
-            // filter
-            let filterFn;
-
-            try {
-               filterFn = filterElem.getFilterFunction();
-            } catch (error) {
-               // continue regardless of error
-            }
-
-            if (filterFn) tempDc.filter(filterFn);
-
-            // sorting
-            (config.sort || []).forEach((sort) => {
-               if (sort.id)
-                  tempDc.sort({
-                     as: "string",
-                     dir: sort.mod || "asc",
-                     by: `#${sort.id}#`,
-                  });
-            });
-
-            result = tempDc.serialize();
-
-            // clear
-            filterElem.destructor();
-            tempDc.destructor();
-
-            // group by
-            if (config?.group?.length) {
-               result = _.groupBy(result, (e) => {
-                  return config.group
-                     .map((column) => {
-                        const parsedColumn = column.split(".");
-                        const originalColumn =
-                           parsedColumn.length > 2
-                              ? `${parsedColumn[1]}.${parsedColumn[2]}`
-                              : column;
-                        const reportField = reportFields.find(
-                           (reportField) => reportField.id === originalColumn
-                        );
-
-                        switch (reportField.type) {
-                           case "date": {
-                              const dateStringData = abWebix.i18n.dateFormatStr(
-                                 e[originalColumn]
-                              );
-                              const parsedDateStringData =
-                                 dateStringData.split("/");
-
-                              switch (parsedColumn[0]) {
-                                 case "day":
-                                    e[column] = parsedDateStringData[1];
-
-                                    return parsedDateStringData[1];
-
-                                 case "month":
-                                    e[column] = parsedDateStringData[0];
-
-                                    return parsedDateStringData[0];
-
-                                 case "year":
-                                    e[column] = parsedDateStringData[2];
-
-                                    return parsedDateStringData[2];
-
-                                 case "yearmonth": {
-                                    e[
-                                       column
-                                    ] = `${parsedDateStringData[0]}/${parsedDateStringData[2]}`;
-
-                                    return e[column];
-                                 }
-
-                                 default:
-                                    e[column] = dateStringData;
-
-                                    return dateStringData;
-
-                                 // switch (reportField.abField.key) {
-                                 //    case "datetime":
-                                 //       return abWebix.i18n.fullDateFormatStr(
-                                 //          e[originalColumn]
-                                 //       );
-
-                                 //    default:
-                                 //       break;
-                                 // }
-                              }
-                           }
-
-                           default:
-                              return e[originalColumn]?.toString?.();
-                        }
-                     })
-                     .join("");
-               });
-
-               result = Object.values(result).map((groupedData) => {
-                  const groupedResult = {};
-
-                  (config.columns || []).forEach((col) => {
-                     const agg = col.split(".")[0];
-                     const rawCol = col.replace(
-                        /sum.|avg.|count.|max.|min./g,
-                        ""
-                     );
-
-                     switch (agg) {
-                        case "sum":
-                           groupedResult[col] = ab.sumBy(groupedData, rawCol);
-                           break;
-                        case "avg":
-                           groupedResult[col] = ab.meanBy(groupedData, rawCol);
-                           break;
-                        case "count":
-                           groupedResult[col] = (groupedData || []).length;
-                           break;
-                        case "max":
-                           groupedResult[col] =
-                              (ab.maxBy(groupedData, rawCol) || {})[rawCol] ||
-                              "";
-                           break;
-                        case "min":
-                           groupedResult[col] =
-                              (ab.minBy(groupedData, rawCol) || {})[rawCol] ||
-                              "";
-                           break;
-                        default:
-                           groupedResult[col] = groupedData[0][col];
-                           break;
-                     }
-                  });
-
-                  return groupedResult;
-               });
-            }
-
-            return result;
-         }
-
-         async getOptions(fields) {
-            return [];
-         }
-         async getFieldData(fieldId) {
-            return [];
-         }
-      }
-      class MyLocal extends reports.services.Local {
-         constructor(app) {
-            super(app);
-
-            this._currentModuleID = "";
-         }
-
-         getQueries() {
-            const currentModuleID = $$(ids.reportManager).getState().moduleId;
-
-            if (this._currentModuleID !== currentModuleID) {
-               this._currentModuleID = currentModuleID;
-               this._queries = null;
-            }
-
-            return super.getQueries();
-         }
-      }
-      class MyEditor extends reports.views.editor {
-         init() {
-            super.init();
-
-            if (!self.readonly || settings.editMode === 1) return;
-
-            const $tabbar = this.$$("tabbar");
-
-            if (settings.hideCommonTab === 1) {
-               const listener = () => {
-                  $tabbar.callEvent("onChange", ["data"]);
-                  $tabbar.disableOption("common");
-                  self.removeListener("editMode.tabbar.query", listener);
-               };
-
-               self.on("editMode.tabbar.query", listener);
-            }
-
-            if (settings.hideDataTab === 1) $tabbar.disableOption("other");
-
-            if (settings.hideViewTab === 1) $tabbar.disableOption("structure");
-
-            this.on(this.app, "editMode.button.back", () => {
-               this.Reset(true);
-            });
-         }
-
-         Reset(forceReset = false) {
-            const id = this.AppState.moduleId;
-            const condition = self.readonly && !(settings.editMode === 1);
-
-            if (!condition || id == null || forceReset) super.Reset();
-
-            this.Local.getModule(id);
-         }
-
-         TrackChanges() {
-            super.TrackChanges();
-
-            if (settings.hideCommonTab) self.emit("editMode.tabbar.query");
-         }
-      }
-      class MyToolBar extends reports.views.toolbar {
-         config() {
-            const ui = super.config();
-
-            if (self.readonly && !(settings.editMode === 1)) {
-               ui.elements[5].cols = ui.elements[5].cols.map((e) =>
-                  Object.assign(e, {
-                     hidden: self.readonly && !(settings.editMode === 1),
-                  })
-               );
-
-               ui.elements[5].cols.push(
-                  {},
-                  {
-                     view: "button",
-                     type: "icon",
-                     icon: "wxi-angle-double-left",
-                     label: self.label("Back"),
-                     localId: "forceReset",
-                     click: () => {
-                        return this.app.callEvent("editMode.button.back", []);
-                     },
-                  }
-               );
-            }
-
-            return ui;
-         }
-      }
-      class MyEditorCommon extends reports.views["editor/common"] {
-         config() {
-            const ui = super.config();
-
-            if (!self.readonly) return ui;
-
-            return Object.assign({}, ui, {
-               elements: ui.elements.map((e, i) =>
-                  Object.assign(
-                     {
-                        hidden: !(i >= 2 && i < 5),
-                     },
-                     e
-                  )
-               ),
-            });
-         }
-
-         ShowDeleteButton() {
-            super.ShowDeleteButton();
-
-            if (self.readonly) this.$$("delete").hide();
-         }
-      }
-      class MyEditorData extends reports.views["editor/data"] {
-         config() {
-            const ui = super.config();
-
-            if (self.readonly) {
-               ui.rows[0].rows[0].hidden = true;
-
-               ui.rows[0].rows.unshift({
-                  label: "Filtering query",
-                  view: "label",
-                  width: 120,
-               });
-            }
-
-            return ui;
-         }
-      }
-      class MyTable extends reports.views.table {
-         // NOTE: fix format of date column type
-         GetColumnConfig(a) {
-            let config = {
-               id: a.id,
-               header:
-                  !a.meta.header || a.meta.header === "none"
-                     ? a.meta.name || a.name
-                     : [
-                          a.meta.name || a.name,
-                          {
-                             content:
-                                a.header === "text"
-                                   ? "textFilter"
-                                   : "richSelectFilter",
-                          },
-                       ],
-               type: a.type,
-               sort: "date",
-               width: a.width || 200,
-            };
-
-            const abField = self.AB.datacollectionByID(
-               a.mid
-            )?.datasource.fields((field) => field.columnName === a.name)[0];
-
-            switch (a.type) {
-               case "date":
-                  config.format = (val) => {
-                     // check valid date
-                     if (val?.getTime && !isNaN(val.getTime()))
-                        return abField?.key === "datetime"
-                           ? abWebix.i18n.fullDateFormatStr(val)
-                           : abWebix.i18n.dateFormatStr(val);
-                     else return "";
-                  };
-
-                  break;
-
-               default:
-                  config = super.GetColumnConfig(a);
-
-                  break;
-            }
-
-            return config;
-         }
-
-         async GetTableData(mod) {
-            const data = await super.GetTableData(mod);
-            const buckets = mod.buckets;
-
-            if (!buckets) return data;
-
-            if (buckets.length === 0) return data;
-
-            const columnIDs = mod.columns.map((e) => e.id);
-            const parsedBuckets = mod.buckets.filter((bucket) =>
-               columnIDs.includes(bucket.column)
-            );
-
-            if (parsedBuckets.length === 0) return data;
-
-            const records = data[0].map((e) => {
-               const parseRecord = {};
-
-               parsedBuckets.forEach((bucket) => {
-                  const options = bucket.options;
-
-                  for (let i = 0; i < options.length; i++)
-                     if (
-                        options[i].values?.includes(e[bucket.column]) ||
-                        i === options.length - 1
-                     ) {
-                        parseRecord[bucket.column] = options[i].id;
-
-                        break;
-                     }
-               });
-
-               return Object.assign({}, e, parseRecord);
-            });
-
-            return [records, data[1]];
-         }
-      }
-
-      const _ui = super.ui([
-         {
-            id: ids.reportManager,
-            view: "reports",
-            toolbar: true,
-            override: new Map([
-               [reports.services.Backend, MyBackend],
-               [reports.services.Local, MyLocal],
-               [reports.views.editor, MyEditor],
-               [reports.views.toolbar, MyToolBar],
-               [reports.views["editor/common"], MyEditorCommon],
-               [reports.views["editor/data"], MyEditorData],
-               [reports.views.table, MyTable],
-            ]),
-         },
-      ]);
-
-      delete _ui.type;
-      delete _ui.height;
-
-      return _ui;
-   }
-
-   async init(AB, accessLevel) {
-      this.AB = AB;
-      this.readonly = accessLevel < 2;
-
-      const $reportManager = $$(this.ids.reportManager);
-      const state = $reportManager.getState();
-
-      state.readonly = this.readonly;
-      state.mode =
-         this.readonly && this.settings.editMode === 1 ? "edit" : "list";
-   }
-
-   getReportFields(dc) {
-      if (!dc) return [];
-
-      const object = dc.datasource;
-      if (!object) return [];
-
-      const fields = [];
-
-      object.fields().forEach((f) => {
-         const columnFormat = f.columnHeader();
-
-         if (!f.isConnection) {
-            let type = "text";
-
-            switch (f.key) {
-               case "boolean":
-               case "number":
-               case "date":
-                  type = f.key;
-
-                  break;
-
-               case "datetime":
-                  type = "date";
-
-                  break;
-
-               default:
-                  break;
-            }
-
-            fields.push({
-               id: f.columnName,
-               name: f.label,
-               filter: f.fieldIsFilterable(),
-               edit: false,
-               type: type,
-               format: columnFormat.format,
-               options: columnFormat.options,
-               ref: "",
-               key: false,
-               show: true,
-               abField: f,
-            });
-
-            return;
-         }
-
-         if (f.isSource()) {
-            const linkedDcs = this.view.application.datacollectionsIncluded(
-               (dc) =>
-                  this.settings.datacollectionIDs.includes(dc.id) &&
-                  dc.settings.datasourceID === f.settings.linkObject
-            );
-
-            (linkedDcs || []).forEach((linkDc) => {
-               fields.push({
-                  id: f.id,
-                  name: f.label,
-                  filter: false,
-                  edit: false,
-                  type: "reference",
-                  ref: linkDc.id,
-                  key: false,
-                  show: false,
-               });
-            });
-         }
-      });
-
-      return fields;
-   }
-
-   async getData(datacollectionId) {
-      const datacollection = this.AB.datacollectionByID(datacollectionId);
-      if (!datacollection) return [];
-
-      const object = datacollection.datasource;
-      if (!object) return [];
-
-      await this.waitInitializingDCEvery(1000, datacollection);
-
-      const reportFields = this.getReportFields(datacollection);
-      const reportData = [];
-      const rawData = datacollection.getData();
-
-      (rawData || []).forEach((row) => {
-         const reportRow = { id: row.id };
-
-         reportRow[`${datacollection.id}.id`] = row.id;
-
-         object.fields().forEach((field) => {
-            const columnName = field.columnName;
-            const col = `${datacollection.id}.${columnName}`;
-
-            if (field) {
-               // FK value of the connect field
-               if (field.isConnection) {
-                  let $pk = field.datasourceLink.PK();
-                  if (Array.isArray(row[columnName]))
-                     reportRow[`${col}.id`] = row[columnName].map(
-                        (link) => link[$pk] || link.id || link
-                     );
-                  else if (row[columnName])
-                     reportRow[`${col}.id`] =
-                        row[columnName][$pk] ||
-                        row[columnName].id ||
-                        row[columnName];
-               } else reportRow[col] = field.format(row);
-            } else reportRow[col] = row[columnName];
-
-            const rField = reportFields.find(
-               (f) => f.id === columnName || f.id === field.id
-            );
-
-            if (!rField) return;
-
-            switch (rField.type) {
-               case "text":
-               case "reference":
-                  reportRow[col] = (reportRow[col] || "").toString();
-                  break;
-
-               case "number":
-                  reportRow[col] = parseFloat(
-                     (reportRow[col] || 0).toString().replace(/[^\d.-]/g, "")
-                  );
-                  break;
-
-               case "date":
-                  reportRow[col] = row[columnName];
-                  if (reportRow[col]) {
-                     if (!(reportRow[col] instanceof Date))
-                        reportRow[col] = this.AB.rules.toDate(row[columnName]);
-                  } else reportRow[col] = "";
-                  break;
-            }
-         });
-
-         reportData.push(reportRow);
-      });
-
-      return reportData;
-   }
-
-   async onShow() {
-      super.onShow();
-
-      const ids = this.ids;
-      const $component = $$(ids.component);
-
-      if ($component != null && !this.__isShowing) {
-         this.__isShowing = true;
-
-         $component.reconstruct();
-      }
-   }
-};
-
-
-/***/ },
-
-/***/ 37514
-/*!*****************************************************************************!*\
-  !*** ./AppBuilder/platform/views/viewComponent/ABViewSchedulerComponent.js ***!
-  \*****************************************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ ABViewSchedulerComponent)
-/* harmony export */ });
-/* harmony import */ var _ABViewComponent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ABViewComponent */ 23687);
-
-
-class ABViewSchedulerComponent extends _ABViewComponent__WEBPACK_IMPORTED_MODULE_0__["default"] {
-   constructor(baseView, idBase, ids) {
-      super(
-         baseView,
-         idBase || `ABViewScheduler_${baseView.id}`,
-         Object.assign(
-            {
-               scheduler: "",
-            },
-            ids
-         )
-      );
-   }
-
-   ui() {
-      const ids = this.ids;
-      const ab = this.AB;
-      const self = this;
-      const abWebix = this.AB.Webix;
-      const settings = this.settings;
-      const dc = this.datacollection;
-      const fieldName = dc?.datasource.fieldByID(
-         settings.dataviewFields.name
-      )?.columnName;
-      const fieldStart = dc?.datasource.fieldByID(
-         settings.dataviewFields.start
-      )?.columnName;
-      const fieldEnd = dc?.datasource.fieldByID(
-         settings.dataviewFields.end
-      )?.columnName;
-      const fieldAllDay = dc?.datasource.fieldByID(
-         settings.dataviewFields.allDay
-      )?.columnName;
-      const fieldRepeat = dc?.datasource.fieldByID(
-         settings.dataviewFields.repeat
-      )?.columnName;
-      const fieldCalendar = dc?.datasource.fieldByID(
-         settings.dataviewFields.calendar
-      )?.columnName;
-      const fieldEventColor = dc?.datasource.fieldByID(
-         settings.dataviewFields.color
-      )?.columnName;
-      const fieldNotes = dc?.datasource.fieldByID(
-         settings.dataviewFields.notes
-      )?.columnName;
-      const fieldOriginID = dc?.datasource.fieldByID(
-         settings.dataviewFields.originID
-      )?.columnName;
-      const fieldSectionID = dc?.datasource.fieldByID(
-         settings.dataviewFields.sectionID
-      )?.columnName;
-      const fieldUnitID = dc?.datasource.fieldByID(
-         settings.dataviewFields.unitID
-      )?.columnName;
-      const dcCalendar = ab.datacollectionByID(
-         this.settings.calendarDataviewID
-      );
-      const fieldTitle = dcCalendar?.datasource.fieldByID(
-         settings.calendarDataviewFields.title
-      )?.columnName;
-      const fieldCalendarColor = dcCalendar?.datasource.fieldByID(
-         settings.calendarDataviewFields.color
-      )?.columnName;
-      const fieldActive = dcCalendar?.datasource.fieldByID(
-         settings.calendarDataviewFields.active
-      )?.columnName;
-      const timelineOptions = [];
-
-      Object.keys(settings.timeline).forEach((key) => {
-         if (settings.timeline[key] === 0) return;
-
-         timelineOptions.push({
-            id: `${key}`,
-            value: `${key.charAt(0).toUpperCase()}${key.slice(1)}`,
-         });
-      });
-
-      const _ui = super.ui([
-         {
-            padding: 6,
-            cols: [
-               { view: "label", width: 150, label: "Export events data to: " },
-               {
-                  view: "button",
-                  width: 100,
-                  value: this.label("Excel"),
-                  hidden: settings.export.excel === 0,
-                  click: () => {
-                     abWebix.toExcel(ids.scheduler);
-                  },
-               },
-               {
-                  view: "button",
-                  width: 100,
-                  value: this.label("CSV"),
-                  hidden: settings.export.csv === 0,
-                  click: () => {
-                     abWebix.toCSV(ids.scheduler);
-                  },
-               },
-               {
-                  view: "button",
-                  width: 100,
-                  value: this.label("PDF"),
-                  hidden: settings.export.pdf === 0,
-                  click: () => {
-                     abWebix.toPDF(ids.scheduler, { autowidth: true });
-                  },
-               },
-               {},
-            ],
-         },
-         {
-            id: ids.scheduler,
-            view: "scheduler",
-            date: new Date(),
-            readonly: settings.readonly === 1,
-            timeline: settings.timeline.timeline === 1,
-            override: new Map([
-               [
-                  scheduler.services.Backend,
-                  class MyBackend extends reports.services.Backend {
-                     async addCalendar(obj) {
-                        if (dcCalendar == null) return {};
-
-                        const data = {};
-
-                        data[fieldTitle] = obj.text;
-                        data[fieldCalendarColor] = obj.color;
-                        data[fieldActive] = obj.active;
-
-                        const response = await dcCalendar.model.create(data);
-
-                        return { id: response.id };
-                     }
-                     async addEvent(obj) {
-                        if (dc == null) return {};
-
-                        const data = {};
-
-                        data[fieldName] = obj.text;
-                        data[fieldStart] = new Date(obj.start_date);
-                        data[fieldEnd] = new Date(obj.end_date);
-                        data[fieldAllDay] = obj.all_day;
-                        data[fieldRepeat] = obj.recurring;
-                        data[fieldCalendar] = obj.calendar;
-                        data[fieldEventColor] = obj.color;
-                        data[fieldSectionID] = obj.section || "No Section";
-                        data[fieldUnitID] = obj.units || "No Unit";
-                        data[fieldNotes] = obj.details;
-                        data[fieldOriginID] = obj.origin_id;
-
-                        const response = await dc.model.create(data);
-
-                        return { id: response.id };
-                     }
-                     async calendars() {
-                        // if we manage a datacollection, then make sure it has started
-                        // loading it's data when we are showing our component.
-                        if (dcCalendar == null) return [];
-
-                        await self.waitInitializingDCEvery(1000, dcCalendar);
-
-                        return dcCalendar.getData().map((e) => {
-                           return {
-                              id: e.id,
-                              text: e[fieldTitle],
-                              color: e[fieldCalendarColor],
-                              active: e[fieldActive],
-                           };
-                        });
-                     }
-                     async events(params) {
-                        // if we manage a datacollection, then make sure it has started
-                        // loading it's data when we are showing our component.
-                        if (dc == null) return [];
-
-                        await self.waitInitializingDCEvery(1000, dc);
-
-                        const units = await this.units();
-                        const sections = await this.sections();
-
-                        return dc.getData().map((e) => {
-                           let unitID = units.find(
-                              (u) => u.id === e[fieldUnitID]
-                           )?.id;
-                           let sectionID = sections.find(
-                              (s) => s.id === e[fieldSectionID]
-                           )?.id;
-
-                           if (sectionID == null || unitID == null) {
-                              sectionID = sectionID || "No Section";
-                              unitID = unitID || "No Unit";
-
-                              // const data = {};
-
-                              // data[fieldSectionID] = sectionID;
-                              // data[fieldUnitID] = unitID;
-
-                              // dc.model.update(e.id, data);
-                           }
-
-                           return {
-                              id: e.id,
-                              text: e[fieldName],
-                              start_date: abWebix.Date.dateToStr(
-                                 "%Y-%m-%d %H:%i:%s"
-                              )(e[fieldStart]),
-                              end_date: abWebix.Date.dateToStr(
-                                 "%Y-%m-%d %H:%i:%s"
-                              )(e[fieldEnd]),
-                              all_day: e[fieldAllDay],
-                              recurring: e[fieldRepeat],
-                              calendar: e[fieldCalendar],
-                              color: e[fieldEventColor],
-                              section: sectionID,
-                              units: unitID,
-                              details: e[fieldNotes],
-                              origin_id: e[fieldOriginID],
-                           };
-                        });
-                     }
-                     async removeCalendar(id) {
-                        await dcCalendar.model.delete(id);
-                     }
-                     async removeEvent(id) {
-                        await dc.model.delete(id);
-                     }
-                     async sections() {
-                        return [
-                           { text: "No Section", id: "No Section" },
-                        ].concat(
-                           settings.timelineSectionList.split(", ").map((e) => {
-                              return {
-                                 id: e,
-                                 text: e,
-                              };
-                           })
-                        );
-                     }
-                     async units() {
-                        return [{ id: "No Unit", value: "No Unit" }].concat(
-                           settings.unitList.split(", ").map((e) => {
-                              return {
-                                 id: e,
-                                 value: e,
-                              };
-                           })
-                        );
-                     }
-                     async updateCalendar(id, obj) {
-                        if (dcCalendar == null) return {};
-
-                        const data = {};
-
-                        data[fieldTitle] = obj.text;
-                        data[fieldCalendarColor] = obj.color;
-                        data[fieldActive] = obj.active;
-
-                        await dcCalendar.model.update(id, data);
-                     }
-                     async updateEvent(id, obj, mode, date) {
-                        if (dc == null) return {};
-
-                        const data = {};
-
-                        data[fieldName] = obj.text;
-                        data[fieldStart] = new Date(obj.start_date);
-                        data[fieldEnd] = new Date(obj.end_date);
-                        data[fieldAllDay] = obj.all_day;
-                        data[fieldRepeat] = obj.recurring;
-                        data[fieldCalendar] = obj.calendar;
-                        data[fieldEventColor] = obj.color;
-                        data[fieldSectionID] = obj.section || "No Section";
-                        data[fieldUnitID] = obj.units || "No Unit";
-                        data[fieldNotes] = obj.details;
-                        data[fieldOriginID] = obj.origin_id;
-
-                        await dc.model.update(id, data);
-                     }
-                  },
-               ],
-               [
-                  scheduler.views["bars/nav"],
-                  class CustomBarsView extends scheduler.views["bars/nav"] {
-                     config() {
-                        const uiNav = super.config();
-                        uiNav.width = 160;
-                        uiNav.options = timelineOptions;
-                        return uiNav;
-                     }
-                  },
-               ],
-               [
-                  scheduler.views["bars/navpopup"],
-                  class CustomNavPopupView extends scheduler.views[
-                     "bars/navpopup"
-                  ] {
-                     config() {
-                        const uiNavPopup = super.config();
-
-                        const options = timelineOptions.map((e) =>
-                           Object.assign({ icon: `shi-${e.id}` }, e)
-                        );
-
-                        if (this.app.config.calendars)
-                           uiNavPopup.body.body.rows[0].data = options;
-                        else uiNavPopup.body.data = options;
-
-                        return uiNavPopup;
-                     }
-                  },
-               ],
-               [
-                  scheduler.views["modes/day/multiday"],
-                  class CustomModesDayMultiday extends scheduler.views[
-                     "modes/day/multiday"
-                  ] {
-                     LimitData(data) {
-                        // Get an error the case when the data parameter is undefined.
-                        super.LimitData(data || []);
-                     }
-                  },
-               ],
-            ]),
-         },
-      ]);
-
-      delete _ui.type;
-
-      return _ui;
-   }
-
-   async onShow() {
-      super.onShow();
-
-      const ids = this.ids;
-      const $component = $$(ids.component);
-
-      if ($component != null && !this.__isShowing) {
-         this.__isShowing = true;
-
-         $component.reconstruct();
-      }
-   }
-};
 
 
 /***/ },
@@ -56800,114 +53130,13 @@ class ABViewSchedulerComponent extends _ABViewComponent__WEBPACK_IMPORTED_MODULE
 /*!********************************************************************!*\
   !*** ./AppBuilder/platform/views/viewProperties/ABViewProperty.js ***!
   \********************************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+(module, __unused_webpack_exports, __webpack_require__) {
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ ABViewProperty)
-/* harmony export */ });
-/* harmony import */ var _ui_ClassUI__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../../../ui/ClassUI */ 93692);
+const FNABViewProperty =
+   (__webpack_require__(/*! ../../plugins/included/view_core/FNABViewProperty.js */ 41843)["default"]);
+const ABUIPlugin = (__webpack_require__(/*! ../../plugins/ABUIPlugin.js */ 4341)["default"]);
 
-
-class ABViewProperty extends _ui_ClassUI__WEBPACK_IMPORTED_MODULE_0__["default"] {
-   // constructor() {}
-
-   /**
-    * @property default
-    * return default settings
-    *
-    * @return {Object}
-    */
-   static get default() {
-      return {};
-   }
-
-   /** == Property == */
-   /**
-    * @function propertyComponent
-    * return the view and logic to display in property panel
-    *
-    * @return {Object} - {
-    * 						ui: webix element,
-    * 						init: function,
-    * 						logic: object
-    * 					}
-    */
-   static propertyComponent() {
-      let ui = {
-         view: "template",
-         template: "No UI",
-      };
-
-      let init = (options) => {
-         // register callbacks:
-         for (var c in logic.callbacks) {
-            logic.callbacks[c] = options[c] || logic.callbacks[c];
-         }
-      };
-
-      let logic = {
-         callbacks: {},
-      };
-
-      return {
-         ui: ui,
-         init: init,
-         logic: logic,
-      };
-   }
-
-   fromSettings(settings) {
-      this.settings = settings;
-   }
-
-   toSettings() {
-      return this.settings || {};
-   }
-
-   /** == UI == */
-   /**
-    * @function component
-    * return the view and logic to display in display widget
-    * @param {object} App
-    *      The shared App object that is created in OP.Component
-    * @param {string} idBase
-    *      Identifier for this component
-    *
-    * @return {Object} - {
-    * 						ui: webix element,
-    * 						init: function,
-    * 						logic: object
-    * 					}
-    */
-   component(App, idBase) {
-      this.App = App;
-      this.idBase = idBase;
-
-      let ui = {
-         view: "template",
-         template: "No UI",
-      };
-
-      let init = (options) => {
-         // register callbacks:
-         for (var c in logic.callbacks) {
-            logic.callbacks[c] = options[c] || logic.callbacks[c];
-         }
-      };
-
-      let logic = {
-         callbacks: {},
-      };
-
-      return {
-         ui: ui,
-         init: init,
-         logic: logic,
-      };
-   }
-}
+module.exports = FNABViewProperty({ ABUIPlugin });
 
 
 /***/ },
@@ -56924,11 +53153,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ ABViewPropertyAddPage)
 /* harmony export */ });
 /* harmony import */ var _ABViewProperty__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ABViewProperty */ 3419);
+/* harmony import */ var _ABViewProperty__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_ABViewProperty__WEBPACK_IMPORTED_MODULE_0__);
 
 
 let L = (...params) => AB.Multilingual.label(...params);
 
-class ABViewPropertyAddPage extends _ABViewProperty__WEBPACK_IMPORTED_MODULE_0__["default"] {
+class ABViewPropertyAddPage extends (_ABViewProperty__WEBPACK_IMPORTED_MODULE_0___default()) {
    /**
     * @property default
     * return default settings
@@ -57480,654 +53710,6 @@ class ABViewPropertyEditPage extends _ABViewPropertyAddPage__WEBPACK_IMPORTED_MO
       };
 
       return comp;
-   }
-}
-
-
-/***/ },
-
-/***/ 95889
-/*!******************************************************************************!*\
-  !*** ./AppBuilder/platform/views/viewProperties/ABViewPropertyFilterData.js ***!
-  \******************************************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ ABViewPropertyFilterData)
-/* harmony export */ });
-/* harmony import */ var _ABMLClass__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../ABMLClass */ 72982);
-/* harmony import */ var _ABViewProperty__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./ABViewProperty */ 3419);
-/* harmony import */ var _viewComponent_ABViewComponent__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../viewComponent/ABViewComponent */ 23687);
-/*
- * ABViewPropertyFilterData
- * This is a displayable ui component that will manage displaying a
- * means of searching for the user.
- *
- * This component will emit: "filter.data" when one of the filter options
- * have been enabled.
- *    "filter.data" has 2 parameters: fnFilter, filterRules
- *       fnFilter {function} when passed a row of data from the grid,
- *                return true/false if it passes the filter.
- *       filterRules {array} of each of the filter rules that have been
- *                created. Note: the fnFilter still checks the validity
- *                of the row based on these rules.
- *                (this is used for the parent component to indicate how
- *                many rules are currently applied to the data being displayed)
- */
-
-
-
-
-
-// const ABViewGridFilterRule = require("../../../rules/ABViewGridFilterRule");
-
-let L = (...params) => AB.Multilingual.label(...params);
-
-class FilterRuleSettings extends _ABMLClass__WEBPACK_IMPORTED_MODULE_0__["default"] {
-   constructor() {
-      super(["label"], AB);
-   }
-
-   fromSettings(settings) {
-      super.fromValues(settings);
-      this.filters = settings.filters;
-   }
-
-   toSettings() {
-      let obj = super.toObj();
-      obj.filters = this.filters;
-      return obj;
-   }
-}
-
-class ABViewPropertyFilterDataComponent extends _viewComponent_ABViewComponent__WEBPACK_IMPORTED_MODULE_2__["default"] {
-   constructor(viewPropertyFilterData, idBase) {
-      var base = idBase || viewPropertyFilterData.idBase;
-      super(base, {});
-   }
-}
-
-class ABViewPropertyFilterData extends _ABViewProperty__WEBPACK_IMPORTED_MODULE_1__["default"] {
-   constructor(AB, idBase) {
-      super(idBase, {
-         buttonAddfilter: "",
-         filterPanel: "",
-         globalFilterFormContainer: "",
-         globalFilterForm: "",
-         filterMenutoolbar: "",
-         resetFilterButton: "",
-      });
-
-      this.AB = AB;
-      this.idBase = idBase;
-      this.object = null;
-      // this.queryRules = [];
-
-      this.__externalSearchText = null;
-      // {string}
-      // External sources of text filters are stored here. This is most likely
-      // from the global search toolbar entry.
-      this.rowFilter = this.AB.filterComplexNew(`${this.ids.component}_filter`);
-      // {RowFilter}
-      // When .userFilterPosition == "toolbar" we use this RowFilter to
-      // display a form in a popup where the toolbar button is.
-
-      this.rowFilterForm = this.AB.filterComplexNew(
-         `${this.ids.component}_filter_form`
-      );
-      // {RowFilter}
-      // When .userFilterPosition == "form" we use this RowFilter to
-      // display a form under the toolbar.
-
-      this._handler_rowFilterChanged = (value) => {
-         let filterRules = value.rules || [];
-
-         // if ($$(ids.buttonFilter)) {
-         //    $$(ids.buttonFilter).define('badge', filterRules.length || null);
-         //    $$(ids.buttonFilter).refresh();
-         // }
-
-         // be notified when there is a change in the filter
-         this.triggerCallback((rowData) => {
-            return this.rowFilter.isValid(rowData);
-         }, filterRules);
-      };
-
-      this._handler_rowFilterFormChanged = () => {
-         this.triggerCallback();
-      };
-
-      this.initialized = false;
-      // {bool}
-      // make sure this is not .init() more than once
-   }
-
-   /**
-    * @property default
-    * return default settings
-    *
-    * @return {Object}
-    */
-   static get default() {
-      return {
-         filterOption: 1,
-         // {integer}
-         // 0 - Not allow
-         // 1 - Enable user filter
-         // 2 - Predefined filter menu
-         // 3 - Global filter input
-
-         // filterOptions == 1 options
-         userFilterPosition: "toolbar",
-         // {string} the location of the filter:
-         //    "toolbar" : there will be an "Add Filters" button on
-         //                the toolbar that will trigger the form popup
-         //    "form"    : there will be a button under the toolbar that
-         //                will bring up the form popup.
-
-         isGlobalToolbar: 1,
-         // {boolean|truthy}
-         // when "toolbar" is chosen for userFilterPosition, this setting
-         // allows us to also include the search criteria specified in
-         // the search box on the toolbar.
-
-         // filterOptions == 2 options
-         // predefined filters created by the builders. There will be
-         // an area under the toolbar that displays buttons to choose
-         // between one of the predefined queryRules.
-         // queryRules: [], // An array of ABViewGridFilterRule object
-
-         // filterOptions == 3 options
-         // globalFilterPosition: "default",
-         // {string} [ "default", "single" ]
-         //    "default" : shows default grid with all potential matches
-         //    "single"  : grid only shows when it has a match.  only 1
-         //                match is shown. ( is this true?? )
-      };
-   }
-
-   /**
-    * @method fromSettings
-    * Create an initial set of default values based upon our settings object.
-    * @param {obj} settings  The settings object we created in .toSettings()
-    */
-   fromSettings(settings) {
-      settings = settings || {};
-
-      settings.filterOption =
-         typeof settings.filterOption != "undefined"
-            ? settings.filterOption
-            : ABViewPropertyFilterData.default.filterOption;
-
-      settings.isGlobalToolbar =
-         typeof settings.isGlobalToolbar != "undefined"
-            ? settings.isGlobalToolbar
-            : ABViewPropertyFilterData.default.isGlobalToolbar;
-
-      this.settings = settings;
-   }
-
-   /**
-    * @method objectLoad
-    * A rule is based upon a Form that was working with an Object.
-    * .objectLoad() is how we specify which object we are working with.
-    *
-    * @param {ABObject} The object that will be used to evaluate the Rules
-    */
-   objectLoad(object) {
-      this.object = object;
-
-      if (this.rowFilter) {
-         // this.rowFilter.applicationLoad(object.application);
-         this.rowFilter.fieldsLoad(object.fields());
-      }
-
-      if (this.rowFilterForm) {
-         // this.rowFilterForm.applicationLoad(object.application);
-         this.rowFilterForm.fieldsLoad(object.fields());
-      }
-   }
-
-   viewLoad(view) {
-      this.view = view;
-   }
-
-   /** == UI == */
-   ui() {
-      var self = this;
-      var ids = this.ids;
-
-      return {
-         id: ids.filterPanel,
-         type: "space",
-         borderless: true,
-         padding: 0,
-         hidden: true,
-         rows: [
-            {
-               id: ids.globalFilterFormContainer,
-               hidden: true,
-               cols: [
-                  {
-                     id: ids.globalFilterForm,
-                     view: "text",
-                     placeholder: L("Search or scan a barcode to see results"),
-                     on: {
-                        onTimedKeyPress: () => {
-                           this.triggerCallback();
-                        },
-                     },
-                  },
-                  {
-                     view: "button",
-                     css: "webix_primary",
-                     width: 28,
-                     type: "icon",
-                     icon: "fa fa-times",
-                     click: function () {
-                        var $form = $$(ids.globalFilterForm);
-                        $form.setValue("");
-                        $form.focus();
-                        $form.callEvent("onTimedKeyPress");
-                     },
-                  },
-               ],
-            },
-            {
-               id: ids.buttonAddfilter,
-               view: "button",
-               css: "webix_primary",
-               value: L("Add Filter"),
-               click: () => {
-                  this.rowFilterForm.popUp($$(ids.buttonAddfilter).getNode(), {
-                     pos: "bottom",
-                  });
-               },
-            },
-            {
-               view: "toolbar",
-               id: ids.filterMenutoolbar,
-               css: "ab-data-toolbar",
-               hidden: true,
-               cols: [
-                  {
-                     view: "button",
-                     css: "webix_primary",
-                     id: ids.resetFilterButton,
-                     label: L("Reset Filter"),
-                     icon: "fa fa-ban",
-                     type: "icon",
-                     // badge: 0,
-                     autowidth: true,
-                     click: function () {
-                        self.resetFilter();
-                     },
-                  },
-               ],
-            },
-         ],
-      };
-   }
-
-   async init(AB) {
-      if (AB) {
-         this.AB = AB;
-      }
-
-      var ids = this.ids;
-      // this.filter_popup = webix.ui({
-      //    view: "popup",
-      //    id: ids.component,
-      //    width: 600,
-      //    height: 400,
-      //    hidden: true,
-      //    body: this.rowFilter.ui,
-      // });
-
-      this.rowFilter.init();
-      this.rowFilter.removeListener("changed", this._handler_rowFilterChanged);
-      this.rowFilter.on("changed", this._handler_rowFilterChanged);
-
-      this.rowFilterForm.init();
-      this.rowFilterForm.removeListener(
-         "changed",
-         this._handler_rowFilterFormChanged
-      );
-      this.rowFilterForm.on("changed", this._handler_rowFilterFormChanged);
-      this.rowFilterForm.removeListener(
-         "save",
-         this._handler_rowFilterFormChanged
-      );
-      this.rowFilterForm.on("save", this._handler_rowFilterFormChanged);
-
-      $$(ids.filterPanel)?.hide();
-      $$(ids.buttonAddfilter)?.hide();
-      $$(ids.filterMenutoolbar)?.hide();
-      $$(ids.globalFilterFormContainer)?.hide();
-
-      switch (this.settings.filterOption) {
-         case 0:
-            break;
-         case 1:
-            switch (this.settings.userFilterPosition) {
-               case "form":
-                  $$(ids.buttonAddfilter)?.show();
-                  $$(ids.filterPanel)?.show();
-                  break;
-               case "toolbar":
-                  $$(ids.filterPanel)?.hide();
-                  break;
-            }
-            break;
-         case 2:
-            $$(ids.filterPanel)?.show();
-            var $filterMenutoolbar = $$(ids.filterMenutoolbar);
-            if ($filterMenutoolbar) {
-               $filterMenutoolbar.show();
-
-               // populate filter items
-               if (this.settings?.queryRules) {
-                  (this.settings.queryRules || []).forEach((qr) => {
-                     let Rule = new FilterRuleSettings();
-                     Rule.fromSettings(qr);
-                     var filterRuleButton = {
-                        view: "button",
-                        css: "webix_primary",
-                        label: Rule.label,
-                        icon: "fa fa-filter",
-                        type: "icon",
-                        // badge: 0,
-                        autowidth: true,
-                        click: () => {
-                           this.emit("filter.data", null, Rule.filters);
-                           // this.selectFilter(qr.filter);
-                        },
-                     };
-                     $filterMenutoolbar.addView(filterRuleButton);
-                  });
-               }
-            }
-            break;
-         case 3:
-            $$(ids.globalFilterFormContainer)?.show();
-            $$(ids.filterPanel)?.show();
-            break;
-      }
-   }
-
-   filterRules() {
-      let rowFilterRules = null;
-
-      switch (this.settings.userFilterPosition) {
-         case "form":
-            rowFilterRules = this.rowFilterForm.getValue();
-            break;
-         case "toolbar":
-            rowFilterRules = this.rowFilter.getValue();
-            break;
-      }
-
-      return rowFilterRules;
-   }
-
-   /**
-    * @method getFilter()
-    * Return a fn() that returns {truthy} with a given row of
-    * data.
-    */
-   getFilter() {
-      // default filter
-      if (this.__currentFilter == null) {
-         // if empty search text in global single mode, then no display rows
-         if (
-            this.settings.filterOption == 3 &&
-            this.settings.globalFilterPosition == "single"
-         )
-            this.__currentFilter = (/* row */) => {
-               return false;
-            };
-         // always true, show every rows
-         else
-            this.__currentFilter = (/* row */) => {
-               return true;
-            };
-      }
-
-      return this.__currentFilter;
-   }
-
-   /**
-    * @method triggerCallback()
-    * We compile our current search options and emit them back to our
-    * parent container.
-    */
-   triggerCallback(/*fnFilter, filterRules*/) {
-      let searchRules = this.searchText(this.__externalSearchText);
-      let rowFilterRules = this.filterRules();
-
-      let badgeCount = 0;
-      if (rowFilterRules?.rules?.length) {
-         badgeCount = rowFilterRules?.rules?.length;
-         if (searchRules) {
-            badgeCount++;
-            rowFilterRules = {
-               glue: "and",
-               rules: [rowFilterRules, searchRules],
-            };
-         }
-      } else {
-         rowFilterRules = searchRules;
-      }
-
-      this.emit("filter.data", null, rowFilterRules);
-
-      if (badgeCount == 0) badgeCount = false;
-      const $button = $$(this.ids.buttonAddfilter);
-      if ($button) {
-         $button.config.badge = badgeCount;
-         $button.refresh();
-      }
-   }
-
-   resetFilter() {
-      this.triggerCallback(() => true, []);
-   }
-
-   /**
-    * @method externalSearchText()
-    * Save any search criteria established from outside this filterHelper.
-    * NOTE: The ABViewGrid has a toolbar search entry that will provide
-    * this value.
-    * @param {string} search
-    *        The typed in search criteria.
-    */
-   externalSearchText(search = null) {
-      this.__externalSearchText = search;
-      this.triggerCallback(); // update each time
-   }
-
-   /**
-    * @method searchText()
-    * Retrieve the typed in search terms from the user, and convert them
-    * into a set of Rules that will modify our results.
-    * If an external search param is provided, use that instead.
-    * @param {string} externalText
-    * @return {json} The QB Rule condition for the search criteria
-    */
-   searchText(externalText) {
-      var search;
-      if (externalText) {
-         search = externalText;
-      } else {
-         search = ($$(this.ids.globalFilterForm)?.getValue() ?? "").trim();
-      }
-      if (!search) return null; // <-- includes ""
-
-      // find the individual "terms" that we should search for
-      let terms = search.trim().toLowerCase().split(" ");
-
-      // build a set of conditions for each term
-      var allTerms = [];
-
-      var allFields = this.object?.fields() || [];
-
-      terms.forEach((t) => {
-         var fieldTerms = [];
-
-         // for each field, add a match condition for that field
-         // (if the field applies)
-         allFields.forEach((f) => {
-            if (f.fieldIsFilterable()) {
-               switch (f.key) {
-                  case "number":
-                  case "string":
-                  case "LongText":
-                  case "email":
-                     fieldTerms.push({
-                        key: f.id,
-                        rule: "contains",
-                        value: t,
-                     });
-                     break;
-
-                  case "list":
-                     var options = f.options();
-                     options.forEach((o) => {
-                        if (o.text.indexOf(t) > -1) {
-                           fieldTerms.push({
-                              key: f.id,
-                              rule: "equals",
-                              value: o.id,
-                           });
-                        }
-                     });
-                     break;
-               }
-            }
-         });
-
-         if (fieldTerms.length > 0) {
-            allTerms.push({
-               glue: "or",
-               rules: fieldTerms,
-            });
-         }
-      });
-
-      if (allTerms.length > 0) {
-         var searchRules = {
-            glue: "and",
-            rules: allTerms,
-         };
-         return searchRules;
-      } else {
-         return null;
-      }
-   }
-
-   showPopup($view) {
-      // this.filter_popup.show($view, null, { pos: "top" });
-      this.rowFilter.popUp($view, null, { pos: "center" });
-   }
-}
-
-
-/***/ },
-
-/***/ 42588
-/*!****************************************************************************!*\
-  !*** ./AppBuilder/platform/views/viewProperties/ABViewPropertyLinkPage.js ***!
-  \****************************************************************************/
-(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ ABViewPropertyLinkPage)
-/* harmony export */ });
-/* harmony import */ var _ABViewProperty__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ABViewProperty */ 3419);
-/* harmony import */ var _viewComponent_ABViewComponent__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../viewComponent/ABViewComponent */ 23687);
-
-
-
-let L = (...params) => AB.Multilingual.label(...params);
-
-class ABViewPropertyLinkPageComponent extends _viewComponent_ABViewComponent__WEBPACK_IMPORTED_MODULE_1__["default"] {
-   constructor(linkPageHelper, idBase) {
-      let base = idBase || `ABViewPropertyLinkPage_xxx`;
-      super(base, {});
-
-      this.linkPageHelper = linkPageHelper;
-      this.AB = linkPageHelper.AB;
-
-      this.view = null;
-      // {ABViewXXXX}
-      // the ABView object this link references.
-
-      this.datacollection = null;
-      // {ABDataCollection}
-      // The related Datacollection to this view that drives it's data.
-      // we usually have to set the cursor before the view displays the
-      // appropriate data.
-   }
-
-   ui() {
-      return {};
-   }
-
-   init(options) {
-      if (options.view) this.view = options.view;
-
-      if (options.datacollection) this.datacollection = options.datacollection;
-   }
-
-   changePage(pageId, rowId) {
-      if (this.datacollection) {
-         this.datacollection.once("changeCursor", () => {
-            this.view?.changePage(pageId);
-         });
-         this.datacollection.setCursor(rowId);
-      } else {
-         this.view?.changePage(pageId);
-      }
-   }
-}
-
-class ABViewPropertyLinkPage extends _ABViewProperty__WEBPACK_IMPORTED_MODULE_0__["default"] {
-   // constructor() {
-   //    super();
-   // }
-
-   /** == UI == */
-   /**
-    * @param {object} App
-    *      The shared App object that is created in OP.Component
-    * @param {string} idBase
-    *      Identifier for this component
-    */
-   component(v1App = false) {
-      let component = new ABViewPropertyLinkPageComponent(this);
-
-      // if this is our v1Interface
-      if (v1App) {
-         var newComponent = component;
-         component = {
-            ui: newComponent.ui(),
-            init: (...params) => {
-               return newComponent.init(...params);
-            },
-            onShow: (...params) => {
-               return newComponent.onShow?.(...params);
-            },
-            changePage: (...params) => {
-               return newComponent.changePage(...params);
-            },
-         };
-      }
-
-      return component;
    }
 }
 
@@ -68078,4 +63660,4 @@ module.exports = class ABCustomEditList {
 /***/ }
 
 }]);
-//# sourceMappingURL=AB.1194319b3142eb365666.js.map
+//# sourceMappingURL=AB.45eb3000cc0e903e3171.js.map

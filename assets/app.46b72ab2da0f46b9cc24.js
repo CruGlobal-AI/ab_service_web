@@ -934,6 +934,12 @@ class Bootstrap extends EventEmitter {
          networkIsSlow
       );
 
+      let additionalPluginResources = {};
+      this._plugins.forEach((p) => {
+         if (typeof p.pluginResources === "function") {
+            Object.assign(additionalPluginResources, p.pluginResources());
+         }
+      });
       const loadPlugin = async (purl) => {
          // Helper to load script with proper MIME type headers
          const loadScriptWithMimeType = async (url) => {
@@ -1103,7 +1109,7 @@ class Bootstrap extends EventEmitter {
          }
          if (typeof registerFn === "function") {
             // Register with the ABFactory core (expects a function taking PluginAPI)
-            this.AB.pluginRegister(registerFn);
+            this.AB.pluginRegister(registerFn, additionalPluginResources);
          } else {
             console.warn("Plugin did not export a function:", purl);
          }
@@ -10173,7 +10179,7 @@ try {
    /* global WEBPACK_MODE SENTRY_DSN VERSION */
    webpackMode = "development";
    dsn = undefined;
-   version = "1.26.6";
+   version = "1.27.0";
 } catch (err) {
    console.warn(
       "Error reading from webpack, check the DefinePlugin is working correctly",
@@ -10724,4 +10730,4 @@ var update = _node_modules_style_loader_dist_runtime_injectStylesIntoStyleTag_js
 /******/ var __webpack_exports__ = __webpack_require__.O();
 /******/ }
 ]);
-//# sourceMappingURL=app.ecdf5d0daa4a00efd3f2.js.map
+//# sourceMappingURL=app.46b72ab2da0f46b9cc24.js.map
