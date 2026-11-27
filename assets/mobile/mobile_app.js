@@ -14720,6 +14720,7 @@ var Views = {};
    __webpack_require__(/*! ../platform/mobile/ABMobileViewFormSelectSingle */ 53800),
    __webpack_require__(/*! ../platform/mobile/ABMobileViewFormTextbox */ 92414),
    __webpack_require__(/*! ../platform/mobile/ABMobileViewLabel */ 12826),
+   __webpack_require__(/*! ../platform/mobile/ABMobileViewGrid */ 94182),
    __webpack_require__(/*! ../platform/mobile/ABMobileViewList */ 78614),
    __webpack_require__(/*! ../platform/mobile/ABMobileViewTimeline */ 7197),
 ].forEach((v) => {
@@ -14756,6 +14757,11 @@ module.exports = class ABViewManagerCore {
 
       if (values.key == "detailselectivity") {
          values.key = "detailconnect";
+      }
+
+      // early PWA pages saved a mobile grid as "grid"
+      if (values.key == "grid") {
+         values.key = "mobile-grid";
       }
 
       //		if ((values.key) && (Views[values.key])) {
@@ -25364,6 +25370,86 @@ class ABMobileViewFormTextboxCore extends _platform_mobile_ABMobileViewFormItem_
 
       // placeholder is a multilingual value:
       this.unTranslate(this.settings, this.settings, ["placeholder"]);
+   }
+}
+
+
+/***/ },
+
+/***/ 18157
+/*!***************************************************************!*\
+  !*** ./src/js/AppBuilder/core/mobile/ABMobileViewGridCore.js ***!
+  \***************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ ABMobileViewGridCore)
+/* harmony export */ });
+/* harmony import */ var _platform_mobile_ABMobileView__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../platform/mobile/ABMobileView */ 99618);
+
+
+const ABViewGridPropertyComponentDefaults = {
+   dataviewID: null,
+   columns: [], // {array} field ids to show, in order
+   height: 0,
+   hideTitle: 0,
+   hideTabs: 0,
+   linkPageAdd: "",
+   linkPageDetail: "",
+};
+
+const ABViewDefaults = {
+   key: "mobile-grid", // {string} unique key for this view
+   icon: "table", // {string} fa-[icon] reference for this view
+   labelKey: "Grid", // {string} the multilingual label key for the class label
+};
+
+class ABMobileViewGridCore extends _platform_mobile_ABMobileView__WEBPACK_IMPORTED_MODULE_0__["default"] {
+   constructor(values, application, parent, defaultValues) {
+      super(values, application, parent, defaultValues || ABViewDefaults);
+   }
+
+   static common() {
+      return ABViewDefaults;
+   }
+
+   static defaultValues() {
+      return ABViewGridPropertyComponentDefaults;
+   }
+
+   /**
+    * @method componentList
+    * return the list of components available on this view to display in the editor.
+    */
+   componentList() {
+      return [];
+   }
+
+   /**
+    * @method fields()
+    * return the ABFields to show as columns, in the order they were picked.
+    * Unknown field ids are skipped.
+    * @return {array} [{ABField}]
+    */
+   fields() {
+      const object = this.datacollection?.datasource;
+      if (!object) return [];
+
+      return (this.settings.columns || [])
+         .map((id) => object.fieldByID(id))
+         .filter((f) => f);
+   }
+
+   /**
+    * @method wantsAdd()
+    * Some widgets can indicate to their containing ABMobilePage that
+    * it wants to provide an [Add] feature.
+    * @return {bool}
+    */
+   get wantsAdd() {
+      return !!this.settings.linkPageAdd;
    }
 }
 
@@ -45573,6 +45659,22 @@ class ABMobileView extends _core_mobile_ABMobileViewCore_js__WEBPACK_IMPORTED_MO
    async init() {}
 
    /**
+    * @method html()
+    * Fallback for views with no display of their own (eg an unknown .key
+    * that fell back to ABMobileView). Render nothing instead of crashing
+    * the whole Page.
+    * @param {$h} $h
+    *        Framework7 Template tool
+    * @return {fn} jsx template
+    */
+   html($h) {
+      console.warn(
+         `ABMobileView[${this.key}]: no html() for this view; rendering nothing.`,
+      );
+      return () => $h`<div class="ab-mobile-view-empty"></div>`;
+   }
+
+   /**
     * @method destroy()
     * perform any actions to clean up during a destroy/page removal
     * happens during $on("pageBeforeRemove", ()=>{})
@@ -47635,6 +47737,166 @@ class ABMobileViewFormTextbox extends _core_mobile_ABMobileViewFormTextboxCore_j
       this.updateProperties($inputElement);
 
       return $inputElement;
+   }
+}
+
+
+/***/ },
+
+/***/ 94182
+/*!***************************************************************!*\
+  !*** ./src/js/AppBuilder/platform/mobile/ABMobileViewGrid.js ***!
+  \***************************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ ABMobileViewGrid)
+/* harmony export */ });
+/* harmony import */ var _core_mobile_ABMobileViewGridCore_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../core/mobile/ABMobileViewGridCore.js */ 18157);
+/**
+ * ABMobileViewGrid
+ * A read only table of the rows in a datacollection.
+ * Columns are the fields picked in settings.columns.
+ */
+
+
+
+class ABMobileViewGrid extends _core_mobile_ABMobileViewGridCore_js__WEBPACK_IMPORTED_MODULE_0__["default"] {
+   async init() {
+      // Nudge the F7 store so the table redraws once the DC has data.
+      // (same trick as ABMobileViewList)
+      setTimeout(() => {
+         let dc = this.datacollection;
+         if (dc) {
+            let allVals = dc.$state[dc.id];
+            dc.$state[dc.id] = allVals;
+         }
+      }, 30);
+   }
+
+   get idGrid() {
+      return `G${this.id}`;
+   }
+
+   rows() {
+      const dc = this.datacollection;
+      if (!dc) return [];
+      return this.AB.$store.getters[dc.id]?.value || [];
+   }
+
+   itemSelected(item) {
+      const dc = this.datacollection;
+      if (dc) {
+         dc.setCursor(item[dc.datasource.PK()] || item.id || item.uuid);
+      }
+
+      if (this.settings.linkPageDetail) {
+         const DetailPage = this.application.pageByID(
+            this.settings.linkPageDetail,
+         );
+         DetailPage?.show(true);
+      }
+   }
+
+   openAddPage() {
+      if (this.settings.linkPageAdd) {
+         const addPage = this.application.pageByID(this.settings.linkPageAdd);
+         addPage?.show(true);
+      }
+   }
+
+   loadMore() {
+      let dc = this.datacollection;
+      if (dc && dc.hasMore()) {
+         this.AB.$store.dispatch("getAppBuilderData", dc.id);
+      }
+   }
+
+   hasMore($h) {
+      if (this.datacollection?.hasMore()) {
+         return $h`<div class="preloader infinite-scroll-preloader"></div>`;
+      }
+      return "";
+   }
+
+   addButton($h) {
+      if (!this.settings.linkPageAdd) return "";
+
+      return $h`
+<div class="float-right">
+   <a
+       href="#"
+       class="link icon-only"
+       onclick=${() => {
+          this.openAddPage();
+       }}
+   >
+   <i class="icon f7-icons if-not-md">plus</i>
+   <i class="icon material-icons md-only">add</i>
+   </a>
+</div>`;
+   }
+
+   gridTitle($h) {
+      if (this.settings.hideTitle && !this.settings.linkPageAdd) {
+         return "";
+      }
+
+      return $h`
+<div class="block-title block-title-medium no-margin-after">
+  ${!this.settings.hideTitle ? this.label : ""}
+  ${this.addButton($h)}
+</div>
+      `;
+   }
+
+   cell($h, field, item) {
+      return $h`<td class="label-cell">${field.format(item)}</td>`;
+   }
+
+   html($h) {
+      const fields = this.fields();
+
+      if (!this.datacollection || fields.length == 0) {
+         return () => $h`
+            ${this.gridTitle($h)}
+            <div class="block">${this.AB.Label()("No columns to show.")}</div>
+         `;
+      }
+
+      return () => $h`
+         ${this.gridTitle($h)}
+         <div
+            id=${this.idGrid}
+            class="infinite-scroll-content"
+            onInfinite=${() => this.loadMore()}
+         >
+            <div class="data-table card">
+               <table>
+                  <thead>
+                     <tr>
+                        ${fields.map(
+                           (f) => $h`<th class="label-cell">${f.label}</th>`,
+                        )}
+                     </tr>
+                  </thead>
+                  <tbody>
+                     ${this.rows().map(
+                        (item) => $h`
+                        <tr
+                           data-id=${item.uuid}
+                           onClick=${() => this.itemSelected(item)}
+                        >
+                           ${fields.map((f) => this.cell($h, f, item))}
+                        </tr>`,
+                     )}
+                  </tbody>
+               </table>
+            </div>
+            ${this.hasMore($h)}
+         </div>`;
    }
 }
 
