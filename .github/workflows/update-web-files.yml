@@ -56,21 +56,21 @@ jobs:
         run: echo "branch=CI/update$PRE/$SHORT_NAME-$VERSION" >> "$GITHUB_OUTPUT"
 
       - name: Checkout Service Web
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.web_ref }}
           path: web
 
       - name: Generate a token
         id: generate-token
-        uses: actions/create-github-app-token@v2
+        uses: actions/create-github-app-token@v3
         with:
-          app-id: ${{ inputs.app_id }}
+          client-id: ${{ inputs.app_id }}
           private-key: ${{ secrets.app_secret }}
           repositories: ${{ inputs.repository }}
         
       - name: Checkout Webpack Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           ref: v${{ inputs.version }}
           token: ${{ steps.generate-token.outputs.token }}
@@ -88,7 +88,7 @@ jobs:
 
       - name: Commit Change to New Branch
         id: commit_version
-        uses: EndBug/add-and-commit@v9
+        uses: EndBug/add-and-commit@v11
         with:
           cwd: ./web
           message: Update platform_web to ${{ inputs.VERSION }}

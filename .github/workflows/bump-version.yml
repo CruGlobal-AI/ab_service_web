@@ -41,7 +41,7 @@ jobs:
       new_version: ${{ steps.new_with_build.outputs.new_version }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.ref }}
 
@@ -109,7 +109,7 @@ jobs:
 
       - name: Commit Change
         id: commit_version
-        uses: EndBug/add-and-commit@v9
+        uses: EndBug/add-and-commit@v11
         env:
           NEW_VERSION: ${{ steps.new_with_build.outputs.new_version }}
         with:

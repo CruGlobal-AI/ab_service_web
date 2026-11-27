@@ -26,16 +26,16 @@ jobs:
    update-plugin:
       runs-on: ubuntu-latest
       steps:
-         - uses: actions/checkout@v4
+         - uses: actions/checkout@v7
            with:
               path: web
          - run: rm -f ./assets/tenant/default/${{ inputs.prefix }}*
            working-directory: web
          - name: Generate a token
            id: generate-token
-           uses: actions/create-github-app-token@v2
+           uses: actions/create-github-app-token@v3
            with:
-              app-id: ${{ vars.DS_GH_APP_ID }}
+              client-id: ${{ vars.DS_GH_APP_ID }}
               private-key: ${{ secrets.DS_GH_APP_PK }}
               repositories: ${{ inputs.repository }}
          - uses: robinraju/release-downloader@v1
@@ -47,7 +47,7 @@ jobs:
               token: ${{ steps.generate-token.outputs.token }}
          - run: ls
          - run: mv build/* web/assets/tenant/default
-         - uses: EndBug/add-and-commit@v9
+         - uses: EndBug/add-and-commit@v11
            with:
               cwd: web
               message: Update ${{ inputs.prefix }} to ${{ inputs.tag }}
