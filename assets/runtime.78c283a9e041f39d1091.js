@@ -165,15 +165,12 @@
 /******/ 		// This function allow to reference async chunks
 /******/ 		__webpack_require__.u = (chunkId) => {
 /******/ 			// return url for filenames not based on template
-/******/ 			if (chunkId === "vendor-node_modules_atomicjs_dist_atomic_min_js-node_modules_atomicjs_dist_atomic_polyfills_m-901782") return "vendor." + chunkId + ".2732de1aa8420eebc4f2.js";
-/******/ 			if (chunkId === "vendor-node_modules_image-size_dist_index_js-node_modules_jszip-utils_lib_index_js") return "vendor." + chunkId + ".7d36595993471091ce42.js";
-/******/ 			if (chunkId === "vendor-vendors-node_modules_formio_bootstrap3_lib_index_js-node_modules_formio_choices_js_pub-00ffbb") return "vendor." + chunkId + ".eb00781ffa25b8defe73.js";
-/******/ 			if (chunkId === "formio-init_formio_js") return "formio." + chunkId + ".8e9e05d9afcdb9151252.js";
+/******/ 			if (chunkId === "vendor-node_modules_atomicjs_dist_atomic_min_js-node_modules_atomicjs_dist_atomic_polyfills_m-901782") return "vendor." + chunkId + ".a193e889ee2869950e84.js";
+/******/ 			if (chunkId === "vendor-vendors-node_modules_formio_bootstrap3_lib_index_js-node_modules_formio_choices_js_pub-00ffbb") return "vendor." + chunkId + ".27ccf0555e5352f2f442.js";
+/******/ 			if (chunkId === "formio-init_formio_js") return "formio." + chunkId + ".ca9cb9f6d54d5158b19a.js";
 /******/ 			if (chunkId === "tinymce-js_webix_extras_tinymce_js") return "tinymce." + chunkId + ".80ae62424dbf6af9b81d.js";
-/******/ 			if (chunkId === "pdfjs-AppBuilder_platform_plugins_included_view_pdfImporter_pdfjs_js") return "pdfjs." + chunkId + ".a4c713dca57e3d202a99.mjs";
-/******/ 			if (chunkId === "pdfjs-vendors-node_modules_pdfjs-dist_build_pdf_worker_mjs") return "pdfjs." + chunkId + ".957955ecd127a9714193.mjs";
 /******/ 			// return url for filenames based on template
-/******/ 			return "" + chunkId + "." + {"webix":"b2e2245d6ee8eb1a059e","webix.resources":"17565c8ab7babe66a2d5","AB":"1194319b3142eb365666","AppBuilder_platform_plugins_included_index_js":"565f90b1917c77226ef0","tinymce-vendors-node_modules_tinymce_icons_default_index_js-node_modules_tinymce_models_dom_i-abe8e5":"40b6fa90d450245d867c","pdfjs-vendors-node_modules_pdfjs-dist_webpack_mjs":"e177d2c29864fbbc6685","utils_networkTest_js":"a9e5c1d2262005f93788"}[chunkId] + ".js";
+/******/ 			return "" + chunkId + "." + {"webix":"b2e2245d6ee8eb1a059e","webix.resources":"17565c8ab7babe66a2d5","AB":"45eb3000cc0e903e3171","AppBuilder_platform_plugins_included_index_js":"0c2d0f958a8b9e49060b","tinymce-vendors-node_modules_tinymce_icons_default_index_js-node_modules_tinymce_models_dom_i-abe8e5":"40b6fa90d450245d867c","utils_networkTest_js":"a9e5c1d2262005f93788"}[chunkId] + ".js";
 /******/ 		};
 /******/ 	})();
 /******/ 	
@@ -381,10 +378,6 @@
 /******/ 				"vendor-vendors-node_modules_formio_bootstrap3_lib_index_js-node_modules_formio_choices_js_pub-00ffbb",
 /******/ 				"tinymce-vendors-node_modules_tinymce_icons_default_index_js-node_modules_tinymce_models_dom_i-abe8e5",
 /******/ 				"tinymce-js_webix_extras_tinymce_js"
-/******/ 			],
-/******/ 			"AppBuilder_platform_plugins_included_index_js": [
-/******/ 				"pdfjs-vendors-node_modules_pdfjs-dist_webpack_mjs",
-/******/ 				"pdfjs-AppBuilder_platform_plugins_included_view_pdfImporter_pdfjs_js"
 /******/ 			]
 /******/ 		};
 /******/ 		__webpack_require__.f.prefetch = (chunkId, promises) => (Promise.all(promises).then(() => {
@@ -398,4 +391,4 @@
 /******/ 	
 /******/ })()
 ;
-//# sourceMappingURL=runtime.2a27bd133dc8f7e7a149.js.map
+//# sourceMappingURL=runtime.78c283a9e041f39d1091.js.map
