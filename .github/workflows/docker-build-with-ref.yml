@@ -49,7 +49,7 @@ jobs:
             core.setOutput('full_tags', fullNames.join(","));
       
       - name: Checkout Service Web
-        uses: actions/checkout@v3
+        uses: actions/checkout@v7
         with:
           ref: ${{ inputs.ref }}
 
