@@ -12845,8 +12845,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _platform_mobile_ABMobileViewFormSelectSingle_js__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ../platform/mobile/ABMobileViewFormSelectSingle.js */ 86681);
 /* harmony import */ var _platform_mobile_ABMobileViewFormTextbox_js__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ../platform/mobile/ABMobileViewFormTextbox.js */ 72805);
 /* harmony import */ var _platform_mobile_ABMobileViewLabel_js__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ../platform/mobile/ABMobileViewLabel.js */ 521);
-/* harmony import */ var _platform_mobile_ABMobileViewList_js__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ../platform/mobile/ABMobileViewList.js */ 53767);
-/* harmony import */ var _platform_mobile_ABMobileViewTimeline_js__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ../platform/mobile/ABMobileViewTimeline.js */ 41768);
+/* harmony import */ var _platform_mobile_ABMobileViewGrid_js__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ../platform/mobile/ABMobileViewGrid.js */ 69871);
+/* harmony import */ var _platform_mobile_ABMobileViewList_js__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ../platform/mobile/ABMobileViewList.js */ 53767);
+/* harmony import */ var _platform_mobile_ABMobileViewTimeline_js__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ../platform/mobile/ABMobileViewTimeline.js */ 41768);
+
 
 
 
@@ -12901,8 +12903,9 @@ var Views = {};
    _platform_mobile_ABMobileViewFormSelectSingle_js__WEBPACK_IMPORTED_MODULE_16__["default"],
    _platform_mobile_ABMobileViewFormTextbox_js__WEBPACK_IMPORTED_MODULE_17__["default"],
    _platform_mobile_ABMobileViewLabel_js__WEBPACK_IMPORTED_MODULE_18__["default"],
-   _platform_mobile_ABMobileViewList_js__WEBPACK_IMPORTED_MODULE_19__["default"],
-   _platform_mobile_ABMobileViewTimeline_js__WEBPACK_IMPORTED_MODULE_20__["default"],
+   _platform_mobile_ABMobileViewGrid_js__WEBPACK_IMPORTED_MODULE_19__["default"],
+   _platform_mobile_ABMobileViewList_js__WEBPACK_IMPORTED_MODULE_20__["default"],
+   _platform_mobile_ABMobileViewTimeline_js__WEBPACK_IMPORTED_MODULE_21__["default"],
 ].forEach((v) => {
    if (v.default?.common) {
       v = v.default;
@@ -12937,6 +12940,11 @@ class ABViewManagerCore {
 
       if (values.key == "detailselectivity") {
          values.key = "detailconnect";
+      }
+
+      // early PWA pages saved a mobile grid as "grid"
+      if (values.key == "grid") {
+         values.key = "mobile-grid";
       }
 
       //		if ((values.key) && (Views[values.key])) {
@@ -23565,6 +23573,86 @@ class ABMobileViewFormTextboxCore extends _platform_mobile_ABMobileViewFormItem_
 
 /***/ },
 
+/***/ 37832
+/*!********************************************************!*\
+  !*** ./AppBuilder/core/mobile/ABMobileViewGridCore.js ***!
+  \********************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ ABMobileViewGridCore)
+/* harmony export */ });
+/* harmony import */ var _platform_mobile_ABMobileView_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../platform/mobile/ABMobileView.js */ 94463);
+
+
+const ABViewGridPropertyComponentDefaults = {
+   dataviewID: null,
+   columns: [], // {array} field ids to show, in order
+   height: 0,
+   hideTitle: 0,
+   hideTabs: 0,
+   linkPageAdd: "",
+   linkPageDetail: "",
+};
+
+const ABViewDefaults = {
+   key: "mobile-grid", // {string} unique key for this view
+   icon: "table", // {string} fa-[icon] reference for this view
+   labelKey: "Grid", // {string} the multilingual label key for the class label
+};
+
+class ABMobileViewGridCore extends _platform_mobile_ABMobileView_js__WEBPACK_IMPORTED_MODULE_0__["default"] {
+   constructor(values, application, parent, defaultValues) {
+      super(values, application, parent, defaultValues || ABViewDefaults);
+   }
+
+   static common() {
+      return ABViewDefaults;
+   }
+
+   static defaultValues() {
+      return ABViewGridPropertyComponentDefaults;
+   }
+
+   /**
+    * @method componentList
+    * return the list of components available on this view to display in the editor.
+    */
+   componentList() {
+      return [];
+   }
+
+   /**
+    * @method fields()
+    * return the ABFields to show as columns, in the order they were picked.
+    * Unknown field ids are skipped.
+    * @return {array} [{ABField}]
+    */
+   fields() {
+      const object = this.datacollection?.datasource;
+      if (!object) return [];
+
+      return (this.settings.columns || [])
+         .map((id) => object.fieldByID(id))
+         .filter((f) => f);
+   }
+
+   /**
+    * @method wantsAdd()
+    * Some widgets can indicate to their containing ABMobilePage that
+    * it wants to provide an [Add] feature.
+    * @return {bool}
+    */
+   get wantsAdd() {
+      return !!this.settings.linkPageAdd;
+   }
+}
+
+
+/***/ },
+
 /***/ 18118
 /*!*********************************************************!*\
   !*** ./AppBuilder/core/mobile/ABMobileViewLabelCore.js ***!
@@ -32164,6 +32252,19 @@ class ABClassApplicationMobile extends _core_ABApplicationMobileCore_js__WEBPACK
       const newPage = new _mobile_ABMobilePage__WEBPACK_IMPORTED_MODULE_2__["default"](values, this);
       newPage.parent = this;
       return newPage;
+   }
+
+   /**
+    * @method viewAll()
+    * Return only the mobile view classes. The web ABApplication.viewAll()
+    * also adds the plugin views from ClassManager (grid, chart, kanban...),
+    * which are web widgets. Without this override they show up in the PWA
+    * "add widget" list and get saved onto mobile pages (eg key "grid").
+    * @param {fn} fn  filter
+    * @return {array}
+    */
+   viewAll(fn = () => true) {
+      return this.ViewManager.allViews(fn);
    }
 
    async setPageDefault(page) {
@@ -46487,6 +46588,42 @@ class ABMobileViewFormTextbox extends (
    //    this.warningsMessage(`${k} references an unknown Page.`);
    // }
 };
+
+
+/***/ },
+
+/***/ 69871
+/*!********************************************************!*\
+  !*** ./AppBuilder/platform/mobile/ABMobileViewGrid.js ***!
+  \********************************************************/
+(__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ ABMobileViewGrid)
+/* harmony export */ });
+/* harmony import */ var _core_mobile_ABMobileViewGridCore__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../core/mobile/ABMobileViewGridCore */ 37832);
+
+
+class ABMobileViewGrid extends _core_mobile_ABMobileViewGridCore__WEBPACK_IMPORTED_MODULE_0__["default"] {
+   warningsEval() {
+      super.warningsEval();
+
+      if ((this.settings.columns || []).length == 0) {
+         this.warningsMessage("has no columns selected.");
+      }
+
+      ["linkPageAdd", "linkPageDetail"].forEach((k) => {
+         if (this.settings[k]) {
+            let page = this.application.pageByID(this.settings[k], true);
+            if (!page) {
+               this.warningsMessage(`${k} references an unknown Page.`);
+            }
+         }
+      });
+   }
+}
 
 
 /***/ },
@@ -68078,4 +68215,4 @@ module.exports = class ABCustomEditList {
 /***/ }
 
 }]);
-//# sourceMappingURL=AB.1194319b3142eb365666.js.map
+//# sourceMappingURL=AB.8214df216610588b5def.js.map
